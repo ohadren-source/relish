@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "RELISH (3,6,9)",
+    "slug": "relish369nu",
+    "version": "1.2.3",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "deploymentTarget": "13.0",
+      "bundleIdentifier": "com.nife36.relish369",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.nife36.relish369",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2260c77f-4a38-46b3-bd13-65b1db3407f6"
+      },
+      "revenueCatPublicKeyIos": "appl_gNFmOHvscXhhhoQWpgDvVPQeLZm"
+    },
+    "owner": "ohadren",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": false
+          }
+        }
+      ]
+    ]
+  }
+}
