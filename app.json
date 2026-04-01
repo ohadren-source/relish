@@ -35,16 +35,6 @@
       },
       "revenueCatPublicKeyIos": "appl_gNFmOHvscXhhhoQWpgDvVPQeLZm"
     },
-    "owner": "ohadren",
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "newArchEnabled": false
-          }
-        }
-      ]
-    ]
+    "owner": "ohadren"
   }
 }
