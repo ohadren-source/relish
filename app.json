@@ -15,7 +15,6 @@
       "**/*"
     ],
     "ios": {
-      "deploymentTarget": "13.0",
       "bundleIdentifier": "com.nife36.relish369",
       "supportsTablet": true,
       "infoPlist": {
