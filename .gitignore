@@ -37,3 +37,7 @@ yarn-error.log*
 # Misc
 .cache/
 .temp/
+
+# Apple private keys — never commit these; store as EAS secrets
+*.p8
+AuthKey_*.p8
