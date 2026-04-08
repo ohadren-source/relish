@@ -138,30 +138,54 @@ const RELISH = () => {
 
   // ============================================================================
   // SUBSCRIPTION MANAGEMENT
+  // IAP ENTRY POINT — tapping "Upgrade to Premium" triggers handleSubscribe()
+  // Offerings: "RELISH PEAK" and "RELISH Premium" configured via RevenueCat
   // ============================================================================
-  
+
   async function handleSubscribe() {
     try {
       const offerings = await Purchases.getOfferings();
-      
-      if (offerings.current && offerings.current.availablePackages.length > 0) {
-        const package_ = offerings.current.availablePackages[0];
-        
-        try {
-          const { customerInfo } = await Purchases.purchasePackage(package_);
-          
-          if (customerInfo.entitlements.active['premium']) {
-            setIsSubscribed(true);
-            Alert.alert('Success', 'You are now subscribed!');
-          }
-        } catch (e) {
-          if (!e.userCancelled) {
-            Alert.alert('Error', 'Failed to complete purchase');
-          }
+
+      if (!offerings.current || offerings.current.availablePackages.length === 0) {
+        Alert.alert(
+          'Subscriptions Unavailable',
+          'In-App Purchases are not available in this environment. Please ensure the Paid Apps Agreement is accepted in App Store Connect and that the subscription products are active.'
+        );
+        return;
+      }
+
+      const package_ = offerings.current.availablePackages[0];
+
+      try {
+        const { customerInfo } = await Purchases.purchasePackage(package_);
+
+        if (customerInfo.entitlements.active['premium']) {
+          setIsSubscribed(true);
+          Alert.alert('Success', 'You are now subscribed!');
+        }
+      } catch (e) {
+        if (!e.userCancelled) {
+          Alert.alert('Error', 'Failed to complete purchase');
         }
       }
     } catch (error) {
       console.error('Subscription error:', error);
+      Alert.alert('Error', 'Unable to load subscription options. Please try again.');
+    }
+  }
+
+  async function restorePurchases() {
+    try {
+      const customerInfo = await Purchases.restorePurchases();
+      if (customerInfo.entitlements.active['premium']) {
+        setIsSubscribed(true);
+        Alert.alert('Restored', 'Your subscription has been restored!');
+      } else {
+        Alert.alert('No Purchases Found', 'No active subscriptions were found for this account.');
+      }
+    } catch (error) {
+      console.error('Restore error:', error);
+      Alert.alert('Error', 'Failed to restore purchases. Please try again.');
     }
   }
 
@@ -180,8 +204,14 @@ const RELISH = () => {
       {!isSubscribed && (
         <TouchableOpacity style={styles.upgradeButton} onPress={handleSubscribe}>
           <Text style={styles.upgradeText}>
-            Premium · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
+            Upgrade to Premium · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
           </Text>
+        </TouchableOpacity>
+      )}
+
+      {!isSubscribed && (
+        <TouchableOpacity style={styles.restoreButton} onPress={restorePurchases}>
+          <Text style={styles.restoreText}>Restore Purchases</Text>
         </TouchableOpacity>
       )}
 
@@ -365,6 +395,18 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 12,
     marginTop: 2,
+  },
+  restoreButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    alignSelf: 'center',
+    marginBottom: 8,
+  },
+  restoreText: {
+    color: '#4ECDC4',
+    fontSize: 13,
+    fontWeight: '500',
   },
 });
 
