@@ -1,1 +1,33 @@
-{\n  "cli": {\n    "version": ">= 16.28.0",\n    "appVersionSource": "remote"\n  },\n  "build": {\n    "development": {\n      "developmentClient": true,\n      "distribution": "internal"\n    },\n    "preview": {\n      "distribution": "internal"\n    },\n    "simulator": {\n      "ios": {\n        "simulator": true\n      },\n      "distribution": "internal"\n    },\n    "production": {\n      "autoIncrement": true\n    }\n  },\n  "submit": {\n    "production": {\n      "ios": {\n        "ascApiKeyPath": "$ASC_API_KEY_PATH",\n        "ascApiKeyIssuerId": "$ASC_API_KEY_ISSUER_ID",\n        "ascApiKeyId": "$ASC_API_KEY_ID"\n      }\n    }\n  }\n}
+{
+  "cli": {
+    "version": ">= 16.28.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "simulator": {
+      "ios": {
+        "simulator": true
+      },
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascApiKeyPath": "$ASC_API_KEY_PATH",
+        "ascApiKeyIssuerId": "$ASC_API_KEY_ISSUER_ID",
+        "ascApiKeyId": "$ASC_API_KEY_ID"
+      }
+    }
+  }
+}
