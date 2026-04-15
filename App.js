@@ -24,13 +24,7 @@ const FALLBACK_PRODUCTS = [
     identifier: 'relish_peak',
     title: 'RELISH PEAK',
     priceString: '$9.99/month',
-    description: 'Unlimited wisdom at peak performance.',
-  },
-  {
-    identifier: 'relish_premium',
-    title: 'RELISH Premium',
-    priceString: '$4.99/month',
-    description: 'Full premium access, unlimited wisdom.',
+    description: 'Peak performance. Unlimited wisdom.',
   },
 ];
 
@@ -138,7 +132,7 @@ const RELISH = () => {
         const errorData = await response.json();
         
         if (response.status === 403) {
-          Alert.alert('Limit Reached', 'Upgrade to Premium for unlimited wisdom', [
+          Alert.alert('Limit Reached', 'Upgrade to RELISH PEAK for unlimited wisdom', [
             { text: 'Upgrade', onPress: openPaywall },
             { text: 'Cancel', onPress: () => {} }
           ]);
@@ -205,7 +199,7 @@ const RELISH = () => {
       if (customerInfo?.entitlements?.active?.['premium']) {
         setIsSubscribed(true);
         setShowPaywall(false);
-        Alert.alert('Welcome to Premium! 🎉', 'You now have unlimited wisdom.');
+        Alert.alert('Welcome to RELISH PEAK! 🎉', 'You now have unlimited wisdom.');
       }
     } catch (e) {
       if (!e.userCancelled) {
@@ -261,8 +255,8 @@ const RELISH = () => {
             <Text style={styles.paywallCloseText}>✕</Text>
           </TouchableOpacity>
 
-          <Text style={styles.paywallTitle}>RELISH Premium</Text>
-          <Text style={styles.paywallSubtitle}>Unlimited Wisdom & Clarity</Text>
+          <Text style={styles.paywallTitle}>RELISH PEAK</Text>
+          <Text style={styles.paywallSubtitle}>Peak Performance · Unlimited Wisdom</Text>
 
           {IS_SIMULATOR && (
             <View style={styles.simulatorBanner}>
@@ -362,7 +356,7 @@ const RELISH = () => {
       {!isSubscribed && (
         <TouchableOpacity style={styles.upgradeButton} onPress={openPaywall}>
           <Text style={styles.upgradeText}>
-            Upgrade to Premium · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
+            Upgrade to RELISH PEAK · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
           </Text>
         </TouchableOpacity>
       )}
