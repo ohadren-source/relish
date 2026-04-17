@@ -341,11 +341,15 @@ const RELISH = () => {
 
           <View style={styles.legalLinksRow}>
             <TouchableOpacity onPress={() => openExternalLink('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
-              <Text style={styles.legalLink}>Terms of Use</Text>
+              <Text style={styles.legalLink}>EULA</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalSeparator}>·</Text>
+            <TouchableOpacity onPress={() => openExternalLink('https://www.janina.cool/support')}>
+              <Text style={styles.legalLink}>Support</Text>
             </TouchableOpacity>
             <Text style={styles.legalSeparator}>·</Text>
             <TouchableOpacity onPress={() => openExternalLink('https://www.janina.cool/privacy')}>
-              <Text style={styles.legalLink}>Privacy Policy</Text>
+              <Text style={styles.legalLink}>Privacy</Text>
             </TouchableOpacity>
           </View>
 
