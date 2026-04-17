@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity,
-  StyleSheet, Alert, Platform, Modal, ActivityIndicator,
+  StyleSheet, Alert, Platform, Modal, ActivityIndicator, Linking,
 } from 'react-native';
 import Purchases from 'react-native-purchases';
 import * as Device from 'expo-device';
@@ -24,13 +24,7 @@ const FALLBACK_PRODUCTS = [
     identifier: 'relish_peak',
     title: 'RELISH PEAK',
     priceString: '$9.99/month',
-    description: 'Unlimited wisdom at peak performance.',
-  },
-  {
-    identifier: 'relish_premium',
-    title: 'RELISH Premium',
-    priceString: '$4.99/month',
-    description: 'Full premium access, unlimited wisdom.',
+    description: 'Peak performance. Unlimited wisdom.',
   },
 ];
 
@@ -138,7 +132,7 @@ const RELISH = () => {
         const errorData = await response.json();
         
         if (response.status === 403) {
-          Alert.alert('Limit Reached', 'Upgrade to Premium for unlimited wisdom', [
+          Alert.alert('Limit Reached', 'Upgrade to RELISH PEAK for unlimited wisdom', [
             { text: 'Upgrade', onPress: openPaywall },
             { text: 'Cancel', onPress: () => {} }
           ]);
@@ -162,7 +156,7 @@ const RELISH = () => {
 
   // ============================================================================
   // SUBSCRIPTION MANAGEMENT
-  // IAP ENTRY POINT — opens a paywall modal listing RELISH PEAK & RELISH Premium
+  // IAP ENTRY POINT — opens a paywall modal listing RELISH PEAK
   // Products are fetched live from RevenueCat; hardcoded fallback shown on failure.
   // ============================================================================
 
@@ -205,7 +199,7 @@ const RELISH = () => {
       if (customerInfo?.entitlements?.active?.['premium']) {
         setIsSubscribed(true);
         setShowPaywall(false);
-        Alert.alert('Welcome to Premium! 🎉', 'You now have unlimited wisdom.');
+        Alert.alert('Welcome to RELISH PEAK! 🎉', 'You now have unlimited wisdom.');
       }
     } catch (e) {
       if (!e.userCancelled) {
@@ -238,8 +232,8 @@ const RELISH = () => {
 
   // ============================================================================
   // PAYWALL MODAL
-  // Always renders both products (live from RevenueCat, or hardcoded fallback).
-  // Apple Review can always reach this screen by tapping "Upgrade to Premium".
+  // Always renders products (live from RevenueCat, or hardcoded fallback).
+  // Apple Review can always reach this screen by tapping "Upgrade to RELISH PEAK".
   // ============================================================================
 
   const renderPaywall = () => {
@@ -261,8 +255,8 @@ const RELISH = () => {
             <Text style={styles.paywallCloseText}>✕</Text>
           </TouchableOpacity>
 
-          <Text style={styles.paywallTitle}>RELISH Premium</Text>
-          <Text style={styles.paywallSubtitle}>Unlimited Wisdom & Clarity</Text>
+          <Text style={styles.paywallTitle}>RELISH PEAK</Text>
+          <Text style={styles.paywallSubtitle}>Peak Performance · Unlimited Wisdom</Text>
 
           {IS_SIMULATOR && (
             <View style={styles.simulatorBanner}>
@@ -337,6 +331,16 @@ const RELISH = () => {
             <Text style={styles.restoreText}>Restore Purchases</Text>
           </TouchableOpacity>
 
+          <View style={styles.legalLinksRow}>
+            <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalSeparator}>·</Text>
+            <TouchableOpacity onPress={() => Linking.openURL('https://www.janina.cool/privacy')}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.paywallLegal}>
             Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
           </Text>
@@ -362,7 +366,7 @@ const RELISH = () => {
       {!isSubscribed && (
         <TouchableOpacity style={styles.upgradeButton} onPress={openPaywall}>
           <Text style={styles.upgradeText}>
-            Upgrade to Premium · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
+            Upgrade to RELISH PEAK · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
           </Text>
         </TouchableOpacity>
       )}
@@ -696,6 +700,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
     marginTop: 16,
+  },
+  legalLinksRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 4,
+  },
+  legalLink: {
+    color: '#4ECDC4',
+    fontSize: 13,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  legalSeparator: {
+    color: '#666',
+    fontSize: 13,
   },
 });
 
