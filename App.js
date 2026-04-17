@@ -230,6 +230,14 @@ const RELISH = () => {
     }
   }
 
+  async function openExternalLink(url) {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to open link right now. Please try again later.');
+    }
+  }
+
   // ============================================================================
   // PAYWALL MODAL
   // Always renders products (live from RevenueCat, or hardcoded fallback).
@@ -332,11 +340,11 @@ const RELISH = () => {
           </TouchableOpacity>
 
           <View style={styles.legalLinksRow}>
-            <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+            <TouchableOpacity onPress={() => openExternalLink('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
               <Text style={styles.legalLink}>Terms of Use</Text>
             </TouchableOpacity>
             <Text style={styles.legalSeparator}>·</Text>
-            <TouchableOpacity onPress={() => Linking.openURL('https://www.janina.cool/privacy')}>
+            <TouchableOpacity onPress={() => openExternalLink('https://www.janina.cool/privacy')}>
               <Text style={styles.legalLink}>Privacy Policy</Text>
             </TouchableOpacity>
           </View>
