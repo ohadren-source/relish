@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity,
-  StyleSheet, Alert, Platform, Modal, ActivityIndicator,
+  StyleSheet, Alert, Platform, Modal, ActivityIndicator, Linking,
 } from 'react-native';
 import Purchases from 'react-native-purchases';
 import * as Device from 'expo-device';
@@ -26,13 +26,8 @@ const FALLBACK_PRODUCTS = [
     priceString: '$9.99/month',
     description: 'Unlimited wisdom at peak performance.',
   },
-  {
-    identifier: 'relish_premium',
-    title: 'RELISH Premium',
-    priceString: '$4.99/month',
-    description: 'Full premium access, unlimited wisdom.',
-  },
 ];
+
 
 const RELISH = () => {
   // ============================================================================
@@ -344,7 +339,6 @@ const RELISH = () => {
       </Modal>
     );
   };
-
   // ============================================================================
   // RENDER
   // ============================================================================
@@ -417,6 +411,9 @@ const RELISH = () => {
           <Text style={styles.footerText}>Runs on RELISH Sauce 🔥 🥗</Text>
           <Text style={styles.footerSmall}>RELISH is for Feelings</Text>
           <Text style={styles.footerSmall}>Sample: CATSUP (Learning) • BBQE (Safety)</Text>
+          <TouchableOpacity onPress={() => Linking.openURL('https://www.sauc-e.com/privatesupport')}>
+            <Text style={styles.footerLink}>https://www.sauc-e.com/privatesupport</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
@@ -553,6 +550,12 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 12,
     marginTop: 2,
+  },
+  footerLink: {
+    color: '#4ECDC4',
+    fontSize: 12,
+    marginTop: 8,
+    textDecorationLine: 'underline',
   },
   restoreButton: {
     backgroundColor: 'transparent',
