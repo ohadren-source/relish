@@ -1,3 +1,9 @@
+// ============================================================================
+// RELISH — version 3.1.2 (Understand.Think.Know)
+// 3_6_NIFE.pi · SOi sauc-e Division · Selkirk, NY
+// Move steadfast && break it down.
+// ============================================================================
+
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity,
@@ -15,6 +21,12 @@ const REVENUECAT_PUBLIC_KEY = 'appl_gNFmOHvscXhhhoQWpgDvVPQeLZm'; // Public key,
 
 const FREE_WISDOM_LIMIT = 10;
 
+// Apple Standard EULA URL — required link for auto-renewing subscriptions
+const APPLE_STANDARD_EULA_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+
+// Privacy Policy and Support URL — hosted at sauc-e.com
+const PRIVACY_AND_SUPPORT_URL = 'https://www.sauc-e.com/privatesupport';
+
 // True when running inside the iOS Simulator (no real StoreKit hardware)
 const IS_SIMULATOR = Platform.OS === 'ios' && !Device.isDevice;
 
@@ -22,7 +34,7 @@ const IS_SIMULATOR = Platform.OS === 'ios' && !Device.isDevice;
 const FALLBACK_PRODUCTS = [
   {
     identifier: 'relish_peak',
-    title: 'RELISH PEAK',
+    title: 'RELISH Peak',
     priceString: '$9.99/month',
     description: 'Unlimited wisdom at peak performance.',
   },
@@ -33,7 +45,7 @@ const RELISH = () => {
   // ============================================================================
   // STATE
   // ============================================================================
-  
+
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [wisdomCount, setWisdomCount] = useState(0);
   const [situation, setSituation] = useState('');
@@ -52,11 +64,11 @@ const RELISH = () => {
   // ============================================================================
   // INITIALIZATION
   // ============================================================================
-  
+
   useEffect(() => {
     initializePurchases();
   }, []);
-  
+
   async function initializePurchases() {
     try {
       // configure() is synchronous in react-native-purchases; no await needed
@@ -84,14 +96,18 @@ const RELISH = () => {
       console.log('Usage sync skipped:', error.message);
     }
   }
-  
+
   async function checkSubscriptionStatus() {
     try {
       const customerInfo = await Purchases.getCustomerInfo();
       const cid = customerInfo?.originalAppUserId ?? null;
-      
+
       setCustomerId(cid);
-      
+
+      // NOTE: 'premium' here is the RevenueCat entitlement identifier,
+      // which cannot be renamed without deleting the entitlement. User-facing
+      // branding is "Peak" everywhere; this internal string stays as 'premium'
+      // because that's how it's configured in the RevenueCat dashboard.
       if (customerInfo?.entitlements?.active?.['premium']) {
         setIsSubscribed(true);
       } else {
@@ -107,7 +123,7 @@ const RELISH = () => {
   // ============================================================================
   // GET WISDOM (Calls backend, NOT Claude directly)
   // ============================================================================
-  
+
   async function handleGetWisdom() {
     if (!situation.trim()) {
       Alert.alert('Error', 'Please describe your situation');
@@ -115,7 +131,7 @@ const RELISH = () => {
     }
 
     setLoading(true);
-    
+
     try {
       const response = await fetch(`${BACKEND_URL}/api/relish/get-wisdom`, {
         method: 'POST',
@@ -131,15 +147,15 @@ const RELISH = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         if (response.status === 403) {
-          Alert.alert('Limit Reached', 'Upgrade to Premium for unlimited wisdom', [
+          Alert.alert('Limit Reached', 'Upgrade to Peak for unlimited wisdom', [
             { text: 'Upgrade', onPress: openPaywall },
             { text: 'Cancel', onPress: () => {} }
           ]);
           return;
         }
-        
+
         throw new Error(errorData.error || 'Failed to get wisdom');
       }
 
@@ -147,7 +163,7 @@ const RELISH = () => {
       setWisdom(data.wisdom);
       setWisdomCount(wisdomCount + 1);
       setSituation('');
-      
+
     } catch (error) {
       Alert.alert('Error', error.message || 'Failed to process request');
     } finally {
@@ -157,7 +173,7 @@ const RELISH = () => {
 
   // ============================================================================
   // SUBSCRIPTION MANAGEMENT
-  // IAP ENTRY POINT — opens a paywall modal listing RELISH PEAK & RELISH Premium
+  // IAP ENTRY POINT — opens a paywall modal listing RELISH Peak
   // Products are fetched live from RevenueCat; hardcoded fallback shown on failure.
   // ============================================================================
 
@@ -197,10 +213,11 @@ const RELISH = () => {
     setPurchasing(true);
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg);
+      // NOTE: 'premium' is the RevenueCat entitlement identifier (see note in checkSubscriptionStatus).
       if (customerInfo?.entitlements?.active?.['premium']) {
         setIsSubscribed(true);
         setShowPaywall(false);
-        Alert.alert('Welcome to Premium! 🎉', 'You now have unlimited wisdom.');
+        Alert.alert('Welcome to Peak! 🎉', 'You now have unlimited wisdom.');
       }
     } catch (e) {
       if (!e.userCancelled) {
@@ -218,6 +235,7 @@ const RELISH = () => {
   async function restorePurchases() {
     try {
       const customerInfo = await Purchases.restorePurchases();
+      // NOTE: 'premium' is the RevenueCat entitlement identifier (see note in checkSubscriptionStatus).
       if (customerInfo?.entitlements?.active?.['premium']) {
         setIsSubscribed(true);
         setShowPaywall(false);
@@ -233,8 +251,9 @@ const RELISH = () => {
 
   // ============================================================================
   // PAYWALL MODAL
-  // Always renders both products (live from RevenueCat, or hardcoded fallback).
-  // Apple Review can always reach this screen by tapping "Upgrade to Premium".
+  // Always renders RELISH Peak (live from RevenueCat, or hardcoded fallback).
+  // Apple Review can always reach this screen by tapping "Upgrade to Peak".
+  // All required subscription disclosures and links live inside the modal.
   // ============================================================================
 
   const renderPaywall = () => {
@@ -248,7 +267,10 @@ const RELISH = () => {
         presentationStyle="pageSheet"
         onRequestClose={() => setShowPaywall(false)}
       >
-        <View style={styles.paywallContainer}>
+        <ScrollView
+          style={styles.paywallContainer}
+          contentContainerStyle={styles.paywallContent}
+        >
           <TouchableOpacity
             style={styles.paywallCloseButton}
             onPress={() => setShowPaywall(false)}
@@ -256,7 +278,7 @@ const RELISH = () => {
             <Text style={styles.paywallCloseText}>✕</Text>
           </TouchableOpacity>
 
-          <Text style={styles.paywallTitle}>RELISH Premium</Text>
+          <Text style={styles.paywallTitle}>RELISH Peak</Text>
           <Text style={styles.paywallSubtitle}>Unlimited Wisdom & Clarity</Text>
 
           {IS_SIMULATOR && (
@@ -302,8 +324,17 @@ const RELISH = () => {
                       if (hasLivePackages) {
                         purchasePackage(item);
                       } else {
-                        // Fallback: re-attempt to load live offerings
-                        openPaywall();
+                        // Fallback: explicit user-visible alert instead of silent retry.
+                        // Fixes the "no action took place / error message" issue Apple flagged
+                        // in Guideline 2.1(b) on v1.2.3 (April 18, 2026).
+                        Alert.alert(
+                          'Subscription Unavailable',
+                          'Subscription pricing could not be loaded from the App Store right now. Please check your internet connection and try again. If the problem continues, please close and reopen the app.',
+                          [
+                            { text: 'Try Again', onPress: openPaywall },
+                            { text: 'Close', style: 'cancel' },
+                          ]
+                        );
                       }
                     }}
                   >
@@ -311,7 +342,7 @@ const RELISH = () => {
                       <Text style={styles.packageTitle}>{title}</Text>
                       {desc ? <Text style={styles.packageDesc}>{desc}</Text> : null}
                       {!hasLivePackages && (
-                        <Text style={styles.packageRetry}>Tap to retry loading from App Store</Text>
+                        <Text style={styles.packageRetry}>Tap for more information</Text>
                       )}
                     </View>
                     <Text style={styles.packagePrice}>{price}</Text>
@@ -332,17 +363,46 @@ const RELISH = () => {
             <Text style={styles.restoreText}>Restore Purchases</Text>
           </TouchableOpacity>
 
+          {/* Subscription Details — required disclosures per Apple Guideline 3.1.2(c) */}
+          <View style={styles.subscriptionDetails}>
+            <Text style={styles.subscriptionDetailsTitle}>Subscription Details</Text>
+            <Text style={styles.subscriptionDetailsText}>
+              • Title: RELISH Peak{'\n'}
+              • Length: 1 month, auto-renewing subscription{'\n'}
+              • Price: $9.99 per month (USD){'\n'}
+              • Price per unit: $9.99 per month
+            </Text>
+          </View>
+
+          {/* Required links — Privacy Policy and Terms of Use (EULA) */}
+          <View style={styles.legalLinksContainer}>
+            <TouchableOpacity
+              style={styles.legalLinkButton}
+              onPress={() => Linking.openURL(PRIVACY_AND_SUPPORT_URL)}
+            >
+              <Text style={styles.legalLinkText}>Privacy Policy and Support</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.legalLinkButton}
+              onPress={() => Linking.openURL(APPLE_STANDARD_EULA_URL)}
+            >
+              <Text style={styles.legalLinkText}>Terms of Use (EULA)</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.paywallLegal}>
-            Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
+            Payment will be charged to your Apple ID account at confirmation of purchase. Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage or cancel your subscription anytime in Settings → Apple ID → Subscriptions.
           </Text>
-        </View>
+        </ScrollView>
       </Modal>
     );
   };
+
   // ============================================================================
   // RENDER
   // ============================================================================
-  
+
   return (
     <ScrollView style={styles.container}>
       {renderPaywall()}
@@ -356,7 +416,7 @@ const RELISH = () => {
       {!isSubscribed && (
         <TouchableOpacity style={styles.upgradeButton} onPress={openPaywall}>
           <Text style={styles.upgradeText}>
-            Upgrade to Premium · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
+            Upgrade to Peak · {Math.max(0, FREE_WISDOM_LIMIT - wisdomCount)} free left
           </Text>
         </TouchableOpacity>
       )}
@@ -369,7 +429,7 @@ const RELISH = () => {
 
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Pick a Context</Text>
-        
+
         {['Life', 'Career', 'Relationships', 'Health', 'Money'].map(c => (
           <TouchableOpacity
             key={c}
@@ -411,8 +471,11 @@ const RELISH = () => {
           <Text style={styles.footerText}>Runs on RELISH Sauce 🔥 🥗</Text>
           <Text style={styles.footerSmall}>RELISH is for Feelings</Text>
           <Text style={styles.footerSmall}>Sample: CATSUP (Learning) • BBQE (Safety)</Text>
-          <TouchableOpacity onPress={() => Linking.openURL('https://www.sauc-e.com/privatesupport')}>
-            <Text style={styles.footerLink}>https://www.sauc-e.com/privatesupport</Text>
+          <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_AND_SUPPORT_URL)}>
+            <Text style={styles.footerLink}>Privacy Policy and Support</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL(APPLE_STANDARD_EULA_URL)}>
+            <Text style={styles.footerLink}>Terms of Use (EULA)</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -574,9 +637,11 @@ const styles = StyleSheet.create({
   paywallContainer: {
     flex: 1,
     backgroundColor: '#1a1a1a',
+  },
+  paywallContent: {
     paddingHorizontal: 24,
     paddingTop: 48,
-    paddingBottom: 32,
+    paddingBottom: 48,
   },
   paywallCloseButton: {
     position: 'absolute',
@@ -693,12 +758,52 @@ const styles = StyleSheet.create({
     color: '#4ECDC4',
     fontSize: 14,
   },
+
+  // ---- Subscription disclosures + legal links (v3.1.2) ----
+  subscriptionDetails: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 12,
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#4ECDC4',
+  },
+  subscriptionDetailsTitle: {
+    color: '#4ECDC4',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  subscriptionDetailsText: {
+    color: '#ccc',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  legalLinksContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  legalLinkButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  legalLinkText: {
+    color: '#4ECDC4',
+    fontSize: 13,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+
   paywallLegal: {
     color: '#666',
     fontSize: 11,
     textAlign: 'center',
     lineHeight: 16,
-    marginTop: 16,
+    marginTop: 8,
   },
 });
 
