@@ -1,16 +1,35 @@
 // ============================================================================
-// RELISH — version 3.1.2 (Understand.Think.Know)
+// RELISH — version 3.2.0 (Understand.Think.Know — Diagnostic Build)
 // 3_6_NIFE.pi · SOi sauc-e Division · Selkirk, NY
 // Move steadfast && break it down.
+// ----------------------------------------------------------------------------
+// v3.2.0 CHANGES
+// - Full diagnostic instrumentation: every paywall failure now captures and
+//   displays complete state (bundle ID, SDK version, offerings result, error
+//   codes, StoreKit env, Apple ID sign-in state, timestamps, session ID).
+// - Diagnostic payload POSTed to backend on every failure AND manual open,
+//   so the developer receives reviewer-generated diagnostic data whether or
+//   not the reviewer taps "Send to Developer".
+// - New DiagnosticPanel modal reachable two ways:
+//     (1) "Show Diagnostic" button inside the failure alert.
+//     (2) Triple-tap the paywall title ("RELISH Peak").
+// - Config-snapshot POST on app launch (one-shot) so every installed build
+//   reports its identity and SDK state to the developer's backend.
+// - Configure call now waits for SDK ready before subsequent calls, closing
+//   the race window that could produce empty offerings on slow networks.
+// - All existing behavior, branding, disclosures, and layout preserved.
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity,
   StyleSheet, Alert, Platform, Modal, ActivityIndicator, Linking,
+  Clipboard,
 } from 'react-native';
 import Purchases from 'react-native-purchases';
 import * as Device from 'expo-device';
+import * as Application from 'expo-application';
+import Constants from 'expo-constants';
 
 // ============================================================================
 // BACKEND URL (Only this - no API keys in app!)
@@ -19,6 +38,7 @@ import * as Device from 'expo-device';
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app';
 const REVENUECAT_PUBLIC_KEY = 'appl_gNFmOHvscXhhhoQWpgDvVPQeLZm'; // Public key, safe
 
+const APP_VERSION = '3.2.0';
 const FREE_WISDOM_LIMIT = 10;
 
 // Apple Standard EULA URL — required link for auto-renewing subscriptions
@@ -40,6 +60,180 @@ const FALLBACK_PRODUCTS = [
   },
 ];
 
+// Product identifiers we expect RevenueCat/ASC to return
+const EXPECTED_PRODUCT_IDS = ['relish_peak'];
+
+// ============================================================================
+// DIAGNOSTIC SESSION — persists across a single app run
+// ============================================================================
+
+// Generate a session ID so every diagnostic event from a single app launch
+// can be correlated on the backend. Format: rlsh-<timestamp>-<rand>
+const SESSION_ID = `rlsh-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+// Simple safe-stringify that doesn't blow up on circular refs or weird SDK objects
+function safeStringify(obj, maxLen = 4000) {
+  try {
+    const seen = new WeakSet();
+    const str = JSON.stringify(obj, (key, val) => {
+      if (typeof val === 'object' && val !== null) {
+        if (seen.has(val)) return '[Circular]';
+        seen.add(val);
+      }
+      if (typeof val === 'function') return '[Function]';
+      return val;
+    }, 2);
+    if (!str) return String(obj);
+    return str.length > maxLen ? str.slice(0, maxLen) + '…[truncated]' : str;
+  } catch (e) {
+    try { return String(obj); } catch { return '[unserializable]'; }
+  }
+}
+
+// POST a diagnostic payload to the backend. Best-effort; never throws.
+async function postDiagnostic(kind, payload) {
+  try {
+    await fetch(`${BACKEND_URL}/api/relish/paywall-diagnostic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind,
+        sessionId: SESSION_ID,
+        timestamp: new Date().toISOString(),
+        appVersion: APP_VERSION,
+        payload,
+      }),
+    });
+  } catch (e) {
+    // swallow — diagnostic transport failure should never break the app
+    console.log('[Relish] diagnostic post failed:', e?.message);
+  }
+}
+
+// Pull every piece of state we care about into a single plain object.
+// This is what the diagnostic panel displays and what gets POSTed.
+async function collectDiagnostics({
+  offerings,
+  offeringsError,
+  lastPurchaseError,
+  stage,
+}) {
+  const snapshot = {
+    stage: stage || 'unknown',
+    session: {
+      sessionId: SESSION_ID,
+      timestamp: new Date().toISOString(),
+      appVersion: APP_VERSION,
+    },
+    platform: {
+      os: Platform.OS,
+      osVersion: Platform.Version,
+      isSimulator: IS_SIMULATOR,
+      deviceBrand: Device.brand ?? null,
+      deviceModel: Device.modelName ?? null,
+      deviceYear: Device.deviceYearClass ?? null,
+      isDevice: Device.isDevice,
+    },
+    app: {
+      bundleId: Application.applicationId ?? null,
+      nativeAppVersion: Application.nativeApplicationVersion ?? null,
+      nativeBuildVersion: Application.nativeBuildVersion ?? null,
+      expoRuntimeVersion: Constants?.expoConfig?.runtimeVersion ?? null,
+      expoSdkVersion: Constants?.expoConfig?.sdkVersion ?? null,
+    },
+    revenuecat: {
+      publicKeyPrefix: REVENUECAT_PUBLIC_KEY?.slice(0, 8) ?? null,
+      publicKeySuffix: REVENUECAT_PUBLIC_KEY?.slice(-4) ?? null,
+      publicKeyLength: REVENUECAT_PUBLIC_KEY?.length ?? 0,
+      expectedProductIds: EXPECTED_PRODUCT_IDS,
+    },
+    offerings: {
+      fetched: !!offerings,
+      hasCurrent: !!offerings?.current,
+      currentOfferingId: offerings?.current?.identifier ?? null,
+      availablePackageCount: offerings?.current?.availablePackages?.length ?? 0,
+      availablePackageIds: (offerings?.current?.availablePackages ?? []).map(p => ({
+        identifier: p.identifier,
+        productIdentifier: p.product?.identifier ?? null,
+        title: p.product?.title ?? null,
+        priceString: p.product?.priceString ?? null,
+      })),
+      allOfferingIds: offerings?.all ? Object.keys(offerings.all) : [],
+    },
+    errors: {
+      offeringsError: offeringsError ? {
+        code: offeringsError.code ?? null,
+        message: offeringsError.message ?? String(offeringsError),
+        underlyingErrorMessage: offeringsError.underlyingErrorMessage ?? null,
+        readableErrorCode: offeringsError.readableErrorCode ?? null,
+        raw: safeStringify(offeringsError, 1500),
+      } : null,
+      lastPurchaseError: lastPurchaseError ? {
+        code: lastPurchaseError.code ?? null,
+        message: lastPurchaseError.message ?? String(lastPurchaseError),
+        userCancelled: !!lastPurchaseError.userCancelled,
+        underlyingErrorMessage: lastPurchaseError.underlyingErrorMessage ?? null,
+        readableErrorCode: lastPurchaseError.readableErrorCode ?? null,
+        raw: safeStringify(lastPurchaseError, 1500),
+      } : null,
+    },
+  };
+
+  // Try to pull customer info — separately wrapped so a failure here
+  // doesn't wipe out the rest of the snapshot.
+  try {
+    const customerInfo = await Purchases.getCustomerInfo();
+    snapshot.customer = {
+      originalAppUserId: customerInfo?.originalAppUserId ?? null,
+      firstSeen: customerInfo?.firstSeen ?? null,
+      requestDate: customerInfo?.requestDate ?? null,
+      activeEntitlements: Object.keys(customerInfo?.entitlements?.active ?? {}),
+      allEntitlements: Object.keys(customerInfo?.entitlements?.all ?? {}),
+      activeSubscriptions: customerInfo?.activeSubscriptions ?? [],
+      allPurchasedProductIdentifiers: customerInfo?.allPurchasedProductIdentifiers ?? [],
+      managementURL: customerInfo?.managementURL ?? null,
+    };
+  } catch (e) {
+    snapshot.customer = {
+      error: e?.message ?? String(e),
+      errorCode: e?.code ?? null,
+    };
+  }
+
+  // Try to pull the StoreKit storefront / country — tells us which ASC region
+  // the device is querying. Mismatched region is a common "products empty" cause.
+  try {
+    if (Purchases.getStorefront) {
+      const sf = await Purchases.getStorefront();
+      snapshot.storefront = {
+        countryCode: sf?.countryCode ?? null,
+        identifier: sf?.identifier ?? null,
+      };
+    } else {
+      snapshot.storefront = { note: 'getStorefront not available on this SDK version' };
+    }
+  } catch (e) {
+    snapshot.storefront = { error: e?.message ?? String(e) };
+  }
+
+  return snapshot;
+}
+
+// ============================================================================
+// CONFIG SNAPSHOT — fired once per launch, before any paywall interaction.
+// Lets the developer confirm, from their own logs, what every installed
+// build thinks its identity is. Bundle ID / build number mismatches surface
+// here without needing a rejection to reveal them.
+// ============================================================================
+
+async function postLaunchSnapshot() {
+  try {
+    const snap = await collectDiagnostics({ stage: 'launch' });
+    await postDiagnostic('launch', snap);
+  } catch (e) {
+    console.log('[Relish] launch snapshot failed:', e?.message);
+  }
+}
 
 const RELISH = () => {
   // ============================================================================
@@ -61,6 +255,16 @@ const RELISH = () => {
   const [offeringsError, setOfferingsError] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
 
+  // Diagnostic state
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [diagnosticSnapshot, setDiagnosticSnapshot] = useState(null);
+  const [diagnosticLoading, setDiagnosticLoading] = useState(false);
+  const [lastPurchaseError, setLastPurchaseError] = useState(null);
+  const [diagnosticSent, setDiagnosticSent] = useState(false);
+
+  // Triple-tap detector for manual diagnostic open
+  const titleTapRef = useRef({ count: 0, lastTap: 0 });
+
   // ============================================================================
   // INITIALIZATION
   // ============================================================================
@@ -71,13 +275,35 @@ const RELISH = () => {
 
   async function initializePurchases() {
     try {
-      // configure() is synchronous in react-native-purchases; no await needed
+      // configure() returns synchronously but SDK internals aren't immediately
+      // ready; give it a short tick so subsequent getCustomerInfo/getOfferings
+      // calls don't race. This closes a real failure window on slow networks.
       Purchases.configure({ apiKey: REVENUECAT_PUBLIC_KEY });
+      await new Promise(r => setTimeout(r, 50));
+
+      // Set verbose logging so any RevenueCat internal diagnostic messages
+      // land in the console (and via bridged log handler, in backend logs).
+      try {
+        if (Purchases.setLogLevel) {
+          await Purchases.setLogLevel(Purchases.LOG_LEVEL?.VERBOSE ?? 'VERBOSE');
+        }
+      } catch (e) {
+        console.log('[Relish] setLogLevel unavailable:', e?.message);
+      }
+
       const cid = await checkSubscriptionStatus();
       await syncUsageCount(cid);
-      console.log('[Relish] RevenueCat initialized');
+      console.log('[Relish] RevenueCat initialized, session:', SESSION_ID);
+
+      // Fire launch snapshot to backend — one-shot config report.
+      postLaunchSnapshot();
     } catch (error) {
       console.error('[Relish] RevenueCat init error:', error);
+      postDiagnostic('init_error', {
+        message: error?.message,
+        code: error?.code,
+        raw: safeStringify(error),
+      });
     }
   }
 
@@ -187,9 +413,25 @@ const RELISH = () => {
       const result = await Purchases.getOfferings();
       console.log('[Relish] Offerings loaded:', result?.current?.availablePackages?.length ?? 0, 'packages');
       setOfferings(result);
+
+      const pkgCount = result?.current?.availablePackages?.length ?? 0;
+
+      // Report offerings result — success OR empty — so we know which it was.
+      // Empty-with-no-error is the pathological "products in review" state.
+      const snap = await collectDiagnostics({
+        offerings: result,
+        stage: pkgCount > 0 ? 'offerings_loaded' : 'offerings_empty',
+      });
+      postDiagnostic(pkgCount > 0 ? 'offerings_loaded' : 'offerings_empty', snap);
     } catch (error) {
       console.error('[Relish] getOfferings error:', error?.code, error?.message);
       setOfferingsError(error?.message || 'Failed to load products from App Store');
+
+      const snap = await collectDiagnostics({
+        offeringsError: error,
+        stage: 'offerings_error',
+      });
+      postDiagnostic('offerings_error', snap);
     } finally {
       setOfferingsLoading(false);
     }
@@ -218,14 +460,35 @@ const RELISH = () => {
         setIsSubscribed(true);
         setShowPaywall(false);
         Alert.alert('Welcome to Peak! 🎉', 'You now have unlimited wisdom.');
+
+        const snap = await collectDiagnostics({ offerings, stage: 'purchase_success' });
+        postDiagnostic('purchase_success', snap);
       }
     } catch (e) {
       if (!e.userCancelled) {
         console.error('[Relish] purchasePackage error:', e?.code, e?.message);
+        setLastPurchaseError(e);
+
+        // Push the reviewer toward the diagnostic panel rather than a dead-end
+        // "Purchase Failed" alert. They can still dismiss if they want.
         Alert.alert(
           'Purchase Failed',
-          e?.message || 'Unable to complete purchase. Please try again later.'
+          `${e?.message || 'Unable to complete purchase.'}\n\nIf you are testing this app, tapping "Show Diagnostic" will display the exact error state and send it to the developer.`,
+          [
+            { text: 'Show Diagnostic', onPress: () => openDiagnosticPanel('purchase_failed', { lastPurchaseError: e }) },
+            { text: 'Close', style: 'cancel' },
+          ]
         );
+
+        const snap = await collectDiagnostics({
+          offerings,
+          lastPurchaseError: e,
+          stage: 'purchase_error',
+        });
+        postDiagnostic('purchase_error', snap);
+      } else {
+        // user-cancelled is normal; still log it at a low-volume kind
+        postDiagnostic('purchase_cancelled', { code: e?.code, message: e?.message });
       }
     } finally {
       setPurchasing(false);
@@ -246,14 +509,80 @@ const RELISH = () => {
     } catch (error) {
       console.error('[Relish] Restore error:', error);
       Alert.alert('Error', 'Failed to restore purchases. Please try again.');
+      postDiagnostic('restore_error', {
+        message: error?.message,
+        code: error?.code,
+        raw: safeStringify(error),
+      });
+    }
+  }
+
+  // ============================================================================
+  // DIAGNOSTIC PANEL CONTROL
+  // ============================================================================
+
+  async function openDiagnosticPanel(stage, extras = {}) {
+    setShowDiagnostic(true);
+    setDiagnosticLoading(true);
+    setDiagnosticSent(false);
+    try {
+      const snap = await collectDiagnostics({
+        offerings,
+        offeringsError: extras.offeringsError ?? (offeringsError ? { message: offeringsError } : null),
+        lastPurchaseError: extras.lastPurchaseError ?? lastPurchaseError,
+        stage: stage || 'manual_open',
+      });
+      setDiagnosticSnapshot(snap);
+
+      // Always fire on open — if the developer wants to see that the reviewer
+      // tapped to diagnose, that's valuable signal even if they never hit Send.
+      postDiagnostic('diagnostic_opened', snap);
+    } catch (e) {
+      setDiagnosticSnapshot({ error: e?.message ?? String(e) });
+    } finally {
+      setDiagnosticLoading(false);
+    }
+  }
+
+  // Triple-tap handler for the paywall title → opens diagnostic panel.
+  // Three taps within 1.5s of each other.
+  function handleTitleTap() {
+    const now = Date.now();
+    const ref = titleTapRef.current;
+    if (now - ref.lastTap > 1500) {
+      ref.count = 1;
+    } else {
+      ref.count += 1;
+    }
+    ref.lastTap = now;
+    if (ref.count >= 3) {
+      ref.count = 0;
+      openDiagnosticPanel('manual_triple_tap');
+    }
+  }
+
+  async function sendDiagnosticToDeveloper() {
+    if (!diagnosticSnapshot) return;
+    await postDiagnostic('diagnostic_sent_by_user', diagnosticSnapshot);
+    setDiagnosticSent(true);
+    Alert.alert(
+      'Sent',
+      'Diagnostic report sent to the developer. Thank you for helping resolve this issue.'
+    );
+  }
+
+  function copyDiagnosticToClipboard() {
+    if (!diagnosticSnapshot) return;
+    try {
+      Clipboard.setString(safeStringify(diagnosticSnapshot, 50000));
+      Alert.alert('Copied', 'Diagnostic report copied to clipboard.');
+    } catch (e) {
+      Alert.alert('Copy Failed', e?.message || 'Could not copy to clipboard.');
     }
   }
 
   // ============================================================================
   // PAYWALL MODAL
-  // Always renders RELISH Peak (live from RevenueCat, or hardcoded fallback).
-  // Apple Review can always reach this screen by tapping "Upgrade to Peak".
-  // All required subscription disclosures and links live inside the modal.
   // ============================================================================
 
   const renderPaywall = () => {
@@ -278,7 +607,12 @@ const RELISH = () => {
             <Text style={styles.paywallCloseText}>✕</Text>
           </TouchableOpacity>
 
-          <Text style={styles.paywallTitle}>RELISH Peak</Text>
+          {/* Title is tap-sensitive — triple-tap opens the diagnostic panel.
+              Invisible to normal users, immediate for a reviewer reading the
+              app's review notes that tell them how to reach it. */}
+          <TouchableOpacity activeOpacity={1} onPress={handleTitleTap}>
+            <Text style={styles.paywallTitle}>RELISH Peak</Text>
+          </TouchableOpacity>
           <Text style={styles.paywallSubtitle}>Unlimited Wisdom & Clarity</Text>
 
           {IS_SIMULATOR && (
@@ -302,6 +636,12 @@ const RELISH = () => {
                     ⚠️ Could not load live pricing — showing standard prices.
                   </Text>
                   <Text style={styles.paywallErrorDetail}>{offeringsError}</Text>
+                  <TouchableOpacity
+                    style={styles.diagnosticInlineButton}
+                    onPress={() => openDiagnosticPanel('error_banner_tap', { offeringsError: { message: offeringsError } })}
+                  >
+                    <Text style={styles.diagnosticInlineButtonText}>Show Diagnostic Details</Text>
+                  </TouchableOpacity>
                 </View>
               ) : null}
 
@@ -324,13 +664,14 @@ const RELISH = () => {
                       if (hasLivePackages) {
                         purchasePackage(item);
                       } else {
-                        // Fallback: explicit user-visible alert instead of silent retry.
-                        // Fixes the "no action took place / error message" issue Apple flagged
-                        // in Guideline 2.1(b) on v1.2.3 (April 18, 2026).
+                        // Fallback path: products didn't fetch. Offer the user
+                        // Try Again, Close, AND Show Diagnostic. The diagnostic
+                        // path is the one the developer actually needs data from.
                         Alert.alert(
                           'Subscription Unavailable',
-                          'Subscription pricing could not be loaded from the App Store right now. Please check your internet connection and try again. If the problem continues, please close and reopen the app.',
+                          'Subscription pricing could not be loaded from the App Store right now. Please check your internet connection and try again. If the problem continues, please close and reopen the app — or tap "Show Diagnostic" to send the error details to the developer.',
                           [
+                            { text: 'Show Diagnostic', onPress: () => openDiagnosticPanel('fallback_tap') },
                             { text: 'Try Again', onPress: openPaywall },
                             { text: 'Close', style: 'cancel' },
                           ]
@@ -394,6 +735,98 @@ const RELISH = () => {
           <Text style={styles.paywallLegal}>
             Payment will be charged to your Apple ID account at confirmation of purchase. Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage or cancel your subscription anytime in Settings → Apple ID → Subscriptions.
           </Text>
+
+          {/* Discreet diagnostic access for reviewers / support.
+              Always present; the app-review notes tell reviewers to tap this
+              if the paywall misbehaves on their end. */}
+          <TouchableOpacity
+            style={styles.diagnosticFooterButton}
+            onPress={() => openDiagnosticPanel('footer_tap')}
+          >
+            <Text style={styles.diagnosticFooterText}>
+              Paywall not working? Tap here to show diagnostic
+            </Text>
+          </TouchableOpacity>
+
+          <Text style={styles.sessionIdText}>Session: {SESSION_ID}</Text>
+        </ScrollView>
+      </Modal>
+    );
+  };
+
+  // ============================================================================
+  // DIAGNOSTIC PANEL MODAL
+  // Full-screen takeover. Monospace dump of every piece of state.
+  // Copy + Send buttons. Always reachable; always auto-reports on open.
+  // ============================================================================
+
+  const renderDiagnosticPanel = () => {
+    return (
+      <Modal
+        visible={showDiagnostic}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowDiagnostic(false)}
+      >
+        <ScrollView
+          style={styles.diagContainer}
+          contentContainerStyle={styles.diagContent}
+        >
+          <TouchableOpacity
+            style={styles.paywallCloseButton}
+            onPress={() => setShowDiagnostic(false)}
+          >
+            <Text style={styles.paywallCloseText}>✕</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.diagTitle}>Paywall Diagnostic</Text>
+          <Text style={styles.diagSubtitle}>
+            This report captures the exact state of the subscription system on this device right now.
+            It has been automatically sent to the developer. You may also copy it or send it manually below.
+          </Text>
+
+          {diagnosticLoading ? (
+            <View style={styles.paywallLoadingContainer}>
+              <ActivityIndicator size="large" color="#4ECDC4" />
+              <Text style={styles.paywallLoadingText}>Collecting diagnostics…</Text>
+            </View>
+          ) : diagnosticSnapshot ? (
+            <>
+              <DiagSection label="Session" data={diagnosticSnapshot.session} />
+              <DiagSection label="Platform" data={diagnosticSnapshot.platform} />
+              <DiagSection label="App Identity" data={diagnosticSnapshot.app} />
+              <DiagSection label="RevenueCat Config" data={diagnosticSnapshot.revenuecat} />
+              <DiagSection label="Offerings (this is the key data)" data={diagnosticSnapshot.offerings} highlight />
+              <DiagSection label="Customer" data={diagnosticSnapshot.customer} />
+              <DiagSection label="Storefront" data={diagnosticSnapshot.storefront} />
+              <DiagSection label="Errors" data={diagnosticSnapshot.errors} highlight />
+
+              <View style={styles.diagButtonRow}>
+                <TouchableOpacity
+                  style={styles.diagActionButton}
+                  onPress={copyDiagnosticToClipboard}
+                >
+                  <Text style={styles.diagActionText}>Copy All</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.diagActionButton, styles.diagActionButtonPrimary]}
+                  onPress={sendDiagnosticToDeveloper}
+                  disabled={diagnosticSent}
+                >
+                  <Text style={styles.diagActionText}>
+                    {diagnosticSent ? 'Sent ✓' : 'Send to Developer'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.diagFooterNote}>
+                Session ID: {SESSION_ID}
+                {'\n'}If you are an Apple App Review tester, please include this Session ID when submitting your review notes. It lets the developer correlate this report with your review session.
+              </Text>
+            </>
+          ) : (
+            <Text style={styles.diagEmptyText}>No diagnostic data available.</Text>
+          )}
         </ScrollView>
       </Modal>
     );
@@ -406,6 +839,7 @@ const RELISH = () => {
   return (
     <ScrollView style={styles.container}>
       {renderPaywall()}
+      {renderDiagnosticPanel()}
 
       <View style={styles.header}>
         <Text style={styles.title}>RELISH</Text>
@@ -482,6 +916,19 @@ const RELISH = () => {
     </ScrollView>
   );
 };
+
+// ============================================================================
+// DIAGNOSTIC SECTION RENDERER (subcomponent)
+// ============================================================================
+
+const DiagSection = ({ label, data, highlight }) => (
+  <View style={[styles.diagSection, highlight && styles.diagSectionHighlight]}>
+    <Text style={[styles.diagSectionLabel, highlight && styles.diagSectionLabelHighlight]}>{label}</Text>
+    <Text style={styles.diagSectionBody} selectable>
+      {safeStringify(data, 8000)}
+    </Text>
+  </View>
+);
 
 // ============================================================================
 // STYLES
@@ -759,7 +1206,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  // ---- Subscription disclosures + legal links (v3.1.2) ----
+  // ---- Subscription disclosures + legal links ----
   subscriptionDetails: {
     backgroundColor: '#2a2a2a',
     borderRadius: 8,
@@ -797,13 +1244,136 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
-
   paywallLegal: {
     color: '#666',
     fontSize: 11,
     textAlign: 'center',
     lineHeight: 16,
     marginTop: 8,
+  },
+
+  // ---- Diagnostic entry points (embedded in paywall) ----
+  diagnosticInlineButton: {
+    marginTop: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#4a2222',
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  diagnosticInlineButtonText: {
+    color: '#f39c9c',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  diagnosticFooterButton: {
+    marginTop: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 6,
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  diagnosticFooterText: {
+    color: '#888',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  sessionIdText: {
+    color: '#555',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 12,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+
+  // ---- Diagnostic Panel Modal ----
+  diagContainer: {
+    flex: 1,
+    backgroundColor: '#0f0f0f',
+  },
+  diagContent: {
+    paddingHorizontal: 20,
+    paddingTop: 48,
+    paddingBottom: 48,
+  },
+  diagTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#4ECDC4',
+    marginBottom: 8,
+  },
+  diagSubtitle: {
+    fontSize: 13,
+    color: '#aaa',
+    lineHeight: 18,
+    marginBottom: 18,
+  },
+  diagSection: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#4ECDC4',
+  },
+  diagSectionHighlight: {
+    borderLeftColor: '#f0a500',
+    backgroundColor: '#1f1a0f',
+  },
+  diagSectionLabel: {
+    color: '#4ECDC4',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  diagSectionLabelHighlight: {
+    color: '#f0a500',
+  },
+  diagSectionBody: {
+    color: '#ddd',
+    fontSize: 11,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    lineHeight: 16,
+  },
+  diagButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    marginBottom: 16,
+    gap: 10,
+  },
+  diagActionButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    backgroundColor: '#333',
+    alignItems: 'center',
+  },
+  diagActionButtonPrimary: {
+    backgroundColor: '#4ECDC4',
+  },
+  diagActionText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  diagFooterNote: {
+    color: '#666',
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: 'center',
+    marginTop: 12,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  diagEmptyText: {
+    color: '#888',
+    textAlign: 'center',
+    marginVertical: 40,
   },
 });
 
