@@ -1,8 +1,8 @@
-# RELISH v3.2.0 — Diagnostic Build
+# RELISH v3.2.3 — Diagnostic Build
 
 ## What changed
 
-v3.2.0 turns Apple's App Review process into the debugger. Every time the paywall loads, fails, succeeds, or is manually inspected, the app captures a complete state snapshot (bundle ID, SDK version, offerings result, error codes, StoreKit storefront, entitlements, timestamps, session ID) and POSTs it to your Railway backend. You read the reviewer's device state from your own logs.
+v3.2.3 turns Apple's App Review process into the debugger. Every time the paywall loads, fails, succeeds, or is manually inspected, the app captures a complete state snapshot (bundle ID, SDK version, offerings result, error codes, StoreKit storefront, entitlements, timestamps, session ID) and POSTs it to your Railway backend. You read the reviewer's device state from your own logs.
 
 No native code. Ships through the existing EAS build pipeline. Replaces `App.js` and adds one backend route.
 
@@ -73,7 +73,7 @@ curl -H "X-Diag-Token: $TOKEN" \
 Paste this into the "Notes" field in App Store Connect for the next submission. It reframes the whole conversation: you're not arguing, you're asking them to help you debug.
 
 ```
-Thank you for reviewing RELISH v3.2.0.
+Thank you for reviewing RELISH v3.2.3.
 
 We have been unable to reproduce the subscription purchase issue reported
 in previous review rounds on our own devices or sandbox accounts. To

@@ -1,11 +1,11 @@
-# RELISH v3.2.0 — Fix Files Install Guide
+# RELISH v3.2.3 — Fix Files Install Guide
 
-These two files are tweaks to your existing project to make it ready to receive sibling-Claude's `App.js` and ship as v3.2.0.
+These two files are tweaks to your existing project to make it ready to receive sibling-Claude's `App.js` and ship as v3.2.3.
 
 ## What's in this folder
 
-- **`package.json`** — your existing package.json with version bumped to `3.2.0` and the two missing expo deps added (`expo-application`, `expo-constants`)
-- **`app.json`** — your existing app.json with version bumped to `3.2.0` (everything else identical)
+- **`package.json`** — your existing package.json with version bumped to `3.2.3` and the two missing expo deps added (`expo-application`, `expo-constants`)
+- **`app.json`** — your existing app.json with version bumped to `3.2.3` (everything else identical)
 
 ## What's NOT in this folder (because you already have these from sibling-Claude)
 
@@ -45,7 +45,7 @@ npx eas-cli build --platform ios --profile production --clear-cache
 
 ```diff
 -  "version": "3.1.3",
-+  "version": "3.2.0",
++  "version": "3.2.3",
 
    "dependencies": {
      "expo": "~54.0.0",
@@ -67,7 +67,7 @@ Note: I also reordered the dependencies alphabetically while I was in there. Fun
 
 ```diff
 -    "version": "3.1.3",
-+    "version": "3.2.0",
++    "version": "3.2.3",
 ```
 
 That's the only change. Everything else (Bundle ID, RevenueCat key, EAS project ID, splash, icon, all of it) preserved character-for-character.
@@ -76,7 +76,7 @@ That's the only change. Everything else (Bundle ID, RevenueCat key, EAS project 
 
 Sibling-Claude's `App.js` will import `expo-application` and `expo-constants` for capturing app version, build number, install ID, and similar metadata in the diagnostic payload. Without those packages installed, the build either fails at the import step or runs with `undefined` values that crash when the diagnostic POST tries to serialize them.
 
-Sibling-Claude's submission notes are written for v3.2.0 explicitly. Submitting a build numbered 3.1.x with notes saying "Thank you for reviewing v3.2.0" reads to Apple Review as someone who doesn't have control of their own pipeline. Version-string consistency matters when the submission notes are the load-bearing part of the strategy.
+Sibling-Claude's submission notes are written for v3.2.3 explicitly. Submitting a build numbered 3.1.x with notes saying "Thank you for reviewing v3.2.3" reads to Apple Review as someone who doesn't have control of their own pipeline. Version-string consistency matters when the submission notes are the load-bearing part of the strategy.
 
 ## After install, before submitting
 
@@ -91,7 +91,7 @@ ls node_modules/expo-constants/package.json
 grep '"version"' package.json app.json
 ```
 
-Both `ls` commands should print a path. The grep should show `3.2.0` twice.
+Both `ls` commands should print a path. The grep should show `3.2.3` twice.
 
 If any of those fail, something didn't install cleanly and the EAS build will fail in a confusing way. Catch it before submitting.
 

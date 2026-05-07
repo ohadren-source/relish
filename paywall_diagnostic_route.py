@@ -16,7 +16,7 @@
 #           "diagnostic_opened" | "diagnostic_sent_by_user",
 #   "sessionId": "rlsh-<timestamp>-<rand>",
 #   "timestamp": "<ISO8601>",
-#   "appVersion": "3.2.0",
+#   "appVersion": "3.2.3",
 #   "payload": { ... full diagnostic snapshot ... }
 # }
 #

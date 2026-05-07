@@ -6,7 +6,7 @@
 
 ## What Changed
 
-v3.2.0 shipped with diagnostic instrumentation. One UI entry point wasn't rendering when offerings returned empty.
+v3.2.3 shipped with diagnostic instrumentation. One UI entry point wasn't rendering when offerings returned empty.
 
 Fixed: diagnostic banner now shows whether offerings fail *or* return zero packages. Reviewer always has a "Show Diagnostic" button.
 

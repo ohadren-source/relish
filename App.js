@@ -1,9 +1,9 @@
 // ============================================================================
-// RELISH — version 3.2.0 (Understand.Think.Know — Diagnostic Build)
+// RELISH — version 3.2.3 (Understand.Think.Know — Diagnostic Build)
 // 3_6_NIFE.pi · SOi sauc-e Division · Selkirk, NY
 // Move steadfast && break it down.
 // ----------------------------------------------------------------------------
-// v3.2.0 CHANGES
+// v3.2.3 CHANGES
 // - Full diagnostic instrumentation: every paywall failure now captures and
 //   displays complete state (bundle ID, SDK version, offerings result, error
 //   codes, StoreKit env, Apple ID sign-in state, timestamps, session ID).
@@ -38,7 +38,7 @@ import Constants from 'expo-constants';
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app';
 const REVENUECAT_PUBLIC_KEY = 'appl_gNFmOHvscXhhhoQWpgDvVPQeLZm'; // Public key, safe
 
-const APP_VERSION = '3.2.0';
+const APP_VERSION = '3.2.3';
 const FREE_WISDOM_LIMIT = 10;
 
 // Apple Standard EULA URL — required link for auto-renewing subscriptions

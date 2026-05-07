@@ -2,7 +2,7 @@
   "expo": {
     "name": "RELISH (3,6,9)",
     "slug": "relish369nu",
-    "version": "3.2.0",
+    "version": "3.2.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,6 +19,9 @@
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "entitlements": {
+        "com.apple.developer.in-app-payments": ["production"]
       }
     },
     "android": {
