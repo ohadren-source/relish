@@ -21,7 +21,7 @@
         "ITSAppUsesNonExemptEncryption": false
       },
       "entitlements": {
-        "com.apple.developer.in-app-payments": ["production"]
+        "com.apple.developer.in-app-payments": ["merchant.com.nife36.relish369"]
       }
     },
     "android": {
