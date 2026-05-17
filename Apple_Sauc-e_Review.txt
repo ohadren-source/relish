@@ -1,0 +1,1927 @@
+App Review
+iOS Submission
+Removed
+
+Items Submitted (1)
+Item
+Type
+Review Status
+iOS App 3.2.3
+
+3.2.1 (46)
+
+App Version
+Removed
+2.1.0 Performance: App Completeness
+
+2.3.2 Performance: Accurate Metadata
+
+3.1.2 Business: Payments - Subscriptions
+
+See More
+Messages (11)
+
+Apple2026-01-27 4:08 AM
+
+Apple2026-01-29 8:44 AM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+
+Review Environment
+
+Submission ID: 04b02b29-c39c-4d1c-aa99-6d313b600a80
+Review date: January 29, 2026
+Review Device: iPhone 17 Pro Max and iPad Air 11-inch (M3)
+Version reviewed: 1.2
+
+
+Guideline 2.1 - Performance - App Completeness
+
+Your app still crashed on launch. We have attached detailed crash logs to help troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max and iPad Air 11-inch (M3) 
+- OS version: iOS 26.2
+
+Next Steps
+
+To address the crash in the app, follow these steps:
+
+1. Fully symbolicate the crash report. See Adding Identifiable Symbol Names to a Crash Report for an explanation of the symbolication process.
+2. Match the crash report to a common pattern. Based on the pattern, take specific actions to further investigate the crash. See Identifying the Cause of Common Crashes.
+3. Test the app on a device to ensure that it now runs as expected.
+4. Once the crash is addressed, create and submit a new build for review.
+
+Resources
+
+For additional information on crash reports, see Diagnosing Issues Using Crash Reports and Device Logs.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+crashlog-255C8B17-3DCC-4A74-918E-85CB5E191ADC.ipsDownload
+crashlog-C982CE97-BAFC-43C1-B824-699AD8595A4B.ipsDownload
+crashlog-CF921670-0559-4A30-BF86-8B520082D8CA.ipsDownload
+crashlog-2AE44353-DF83-4DAE-9B7E-45B428B0F50E.ipsDownload
+crashlog-F5C919A9-727C-4477-8295-51258F896378.ipsDownload
+crashlog-E44F92D2-FA6B-403B-B093-74C81B029921.ipsDownload
+
+Kathleen Schechner2026-01-30 2:44 AM
+Hello,
+Thank you for the detailed crash logs and guidance. We have identified and resolved the issue affecting all three applications.
+Issue Identified:
+The crashes were caused by RevenueCat's native module initialization occurring too early in the app lifecycle, before the React Native bridge was fully ready. This triggered a native ObjC exception during TurboModule invocation, resulting in SIGABRT crashes on launch.
+Resolution Applied:
+We have moved RevenueCat configuration to post-launch initialization using a delayed useEffect pattern. This allows the app to mount successfully before initializing payment infrastructure. The apps now launch cleanly, and RevenueCat initializes safely in the background after the bridge is ready.
+Technical Details:
+
+Modified initialization to use setTimeout wrapper (500ms delay)
+Added proper cleanup handlers
+Maintained graceful degradation if RevenueCat initialization fails
+Apps continue functioning normally regardless of payment system status
+
+New Builds Submitted:
+
+CATSUP 369: Version 1.0.3 (Build 4)
+BBQE (3,6,9): Version 1.0.3 (Build 4)
+RELISH: Version 1.0.3 (Build 4)
+
+All three applications have been tested and launch without crashes. The delayed initialization pattern resolves the timing issue identified in your crash reports.
+Please let us know if you need any additional information or have further questions.
+Best regards,
+Ohad
+
+Apple2026-02-02 8:15 PM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+
+Review Environment
+
+Submission ID: 04b02b29-c39c-4d1c-aa99-6d313b600a80
+Review date: February 03, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 1.2
+
+
+Guideline 2.1 - Performance - App Completeness
+
+We were still unable to review the app because it crashed on launch. We have attached detailed crash logs to help troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.2
+
+Next Steps
+
+To address the crash in the app, follow these steps:
+
+1. Fully symbolicate the crash report. See Adding Identifiable Symbol Names to a Crash Report for an explanation of the symbolication process.
+2. Match the crash report to a common pattern. Based on the pattern, take specific actions to further investigate the crash. See Identifying the Cause of Common Crashes.
+3. Test the app on a device to ensure that it now runs as expected.
+4. Once the crash is addressed, create and submit a new build for review.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+crashlog-48E112E4-66AE-45CE-84EF-BC7D2957BC51.ipsDownload
+crashlog-124D2576-F442-4CBA-B7D7-BD4FBE1CD854.ipsDownload
+crashlog-C9838D22-4B9C-4026-9263-1C2270C422B6.ipsDownload
+crashlog-CF3C5D98-FE4C-4DDD-B8E8-CC4F273CA7ED.ipsDownload
+
+Kathleen Schechner2026-02-03 2:23 AM
+**Subject: CATSUP (3,6,9), BBQE (3,6,9), RELISH (3,6,9) - Updated Architecture & Security**
+
+Dear Apple Review Team,
+
+We are resubmitting three applications (CATSUP (3,6,9), BBQE (3,6,9), RELISH (3,6,9)) with significant security improvements.
+
+**Previous Feedback:** Your team correctly identified that API credentials should not be embedded in the iOS client. We have implemented this feedback completely.
+
+**What We Changed:**
+
+All three applications now use a secure backend infrastructure (Railway) for all API calls:
+- CATSUP (3,6,9): Claude API calls now routed server-side
+- BBQE (3,6,9): RapidAPI threat database queries now routed server-side  
+- RELISH (3,6,9): Claude API calls now routed server-side
+
+The iOS apps contain zero sensitive credentials. All requests are made to our verified backend at `https://sauc-e-backend-production.up.railway.app`
+
+RevenueCat integration uses only the public API key (as intended by RevenueCat).
+
+**Security Model:**
+- Device: Calls backend with user question/email
+- Backend: Uses hardcoded API credentials to call third-party services
+- Backend: Returns clean results to device
+- Device: Never sees API credentials
+
+**Architecture Benefits:**
+- Zero exposed secrets in app bundle
+- Easier credential rotation (backend update only)
+- Audit trail for all API calls
+- Rate limiting at backend level
+- Improved privacy
+
+We appreciate your guidance on best practices. This architecture reflects industry standards for mobile app security.
+
+Submitting for your review.
+
+warm regards,
+
+Ohad Phoenix Oren
+
+Apple2026-02-04 6:58 PM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 04b02b29-c39c-4d1c-aa99-6d313b600a80
+Review date: February 04, 2026
+Review Device: iPad Air (5th generation)
+Version reviewed: 1.2
+
+
+Guideline 2.1 - Performance - App Completeness
+
+We were unable to review the app because it continues to crash on launch. We have attached detailed crash logs to help troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air (5th generation) 
+- OS version: iPadOS 26.2
+
+Next Steps
+
+To address the crash in the app, follow these steps:
+
+1. Fully symbolicate the crash report. See Adding Identifiable Symbol Names to a Crash Report for an explanation of the symbolication process.
+2. Match the crash report to a common pattern. Based on the pattern, take specific actions to further investigate the crash. See Identifying the Cause of Common Crashes.
+3. Test the app on a device to ensure that it now runs as expected.
+4. Once the crash is addressed, create and submit a new build for review.
+
+Resources
+
+For additional information on crash reports, see Diagnosing Issues Using Crash Reports and Device Logs.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+crashlog-34E04448-29F2-4212-8121-6544F1E0AB02.ipsDownload
+crashlog-AC886E6B-4575-457D-B487-4BD2AE738913.ipsDownload
+crashlog-E0633D63-886F-4DD7-B520-DF636E916918.ipsDownload
+crashlog-28A987FD-E487-401C-854A-23878E36D3F4.ipsDownload
+
+Kathleen Schechner2026-02-06 9:43 AM
+ Hi App Review Team,
+
+Thank you for your patience. We're resubmitting both RELISH (3,6,9) v1.2.3 and BBQE (3,6,9) v1.2.3 with the following fixes applied to both apps:
+
+• Resolved startup crash (SIGABRT / TurboModule exception on launch) by correcting the entry point from expo-router to the standard Expo AppEntry, consistent with our CATSUP (3,6,9) app.
+
+• Removed unused expo-router dependencies and related packages (gesture-handler, reanimated, screens) that were causing native module initialization failures.
+
+• Added missing react-native-purchases dependency for RevenueCat/StoreKit integration.
+
+• Simplified splash screen and app.json configuration to match our CATSUP (3,6,9) build pattern.
+
+• Fixed free tier usage tracking — the frontend now syncs with the backend on launch to display accurate remaining free uses before requiring subscription.
+
+• No API keys are stored in the client. All sensitive calls route through our SAUC-E backend hosted on Railway.
+
+Both apps now launch cleanly, render correctly, and have been tested on iPhone and iPad simulators. The architecture mirrors our CATSUP (3,6,9) approved app.
+
+Warmest Regards,
+Ohad Phoenix Oren
+Message Attachments:
+RELISH (3,6,9) iPhone 16 Pro Max.pngDownload
+RELISH (3,6,9) iPad Air 13-inch (M3).pngDownload
+
+Apple2026-02-07 4:49 AM
+Hello,
+
+Thank you for your resubmission. Upon further review, we identified additional issues that need your attention. See below for more information.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+
+Submission ID: 04b02b29-c39c-4d1c-aa99-6d313b600a80
+Review date: February 07, 2026
+Review Device: iPhone 17 Pro Max and iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+
+Guideline 2.1 - Performance - App Completeness
+
+We are unable to complete the review of the app because one or more of the in-app purchase products have not been submitted for review.
+
+Specifically, the app includes references to subscriptions but the associated in-app purchase products have not been submitted for review.
+
+Next Steps
+
+To resolve this issue, please be sure to take action and submit your in-app purchases and upload a new binary in App Store Connect so we can proceed with our review. 
+
+Note you must provide an App Review screenshot in App Store Connect in order to submit in-app purchases for review. Learn more about required in-app purchase metadata.
+
+Resources 
+
+- Learn more about how to offer in-app purchases.
+- Learn more about submitting In-App Purchases and subscriptions to App Review.
+
+
+Guideline 2.1 - Performance - App Completeness
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, no action took place when we tapped to upgrade. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max and iPad Air 11-inch (M3)
+- OS version: iOS 26.3 and iPadOS 26.3
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+5d4dba4d9fcbb29f87874bec3457780aa7b08102.jpgDownload
+ba4cc50264a52137231c1bda6b9f43665097f6bd.jpgDownload
+Screenshot-0207-094656.pngDownload
+
+Kathleen Schechner2026-02-07 10:45 AM
+We're grateful for your detailed feedback on CATSUP (3,6,9), BBQE (3,6,9), and RELISH (3,6,9). We sincerely appreciate your guidance—it helped us identify exactly what was missing.
+
+We've now completed all required metadata and configuration across all three apps:
+
+**CATSUP Pro:**
+- Connected In-App Purchases and Subscriptions section
+- Localization: English (U.S.) with Display Name and Description
+- Subscription Group Display Name: Added
+- Review Screenshot: Pricing tier comparison uploaded to IAP Review Information section
+- Review Notes: Added
+- App Previews and Screenshots: Removed the comparative pricing image from this section
+
+**BBQE:**
+- Connected In-App Purchases and Subscriptions section (BBQE Premium Monthly and BBQE Pit Boss Annual now linked)
+- BBQE Premium Monthly: Complete localization, screenshot in IAP Review Information, and review notes
+- BBQE Pit Boss Annual: Complete localization, screenshot in IAP Review Information, and review notes
+- Subscription Group Display Name: Configured
+- App Previews and Screenshots: Removed the comparative pricing image from this section
+
+**RELISH Premium:**
+- Connected In-App Purchases and Subscriptions section
+- Localization: English (U.S.) with Display Name and Description
+- Subscription Group Display Name: Added
+- Review Screenshot: Pricing tier comparison uploaded to IAP Review Information section
+- Review Notes: Added
+- App Previews and Screenshots: Removed the comparative pricing image from this section
+
+We now understand that the In-App Purchases and Subscriptions section must be explicitly configured for each app—this wasn't connected initially. We've corrected this across all three. We also understand the distinction: app screenshots showcase the user experience, while IAP review screenshots demonstrate pricing and subscription details. Each is placed in its proper location.
+
+All in-app purchase products are now properly configured and ready for your review.
+
+We're grateful for your patience and clear guidance. These apps represent months of development, and your standards help us build better products.
+
+Thank you for everything you do.
+
+Yours Truly, 
+Ohad Phoenix Oren
+3.6.Nife
+
+Apple2026-02-10 4:42 PM
+Hello,
+
+Thank you for your efforts to follow our guidelines. There are still some issues that need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 04b02b29-c39c-4d1c-aa99-6d313b600a80
+Review date: February 10, 2026
+Review Device: iPad Pro 11-inch (M4)
+Version reviewed: 1.2.3
+
+
+Guideline 2.3.2 - Performance - Accurate Metadata
+
+We noticed that your promotional image to be displayed on the App Store does not sufficiently represent the associated promoted in-app purchase and/or win back offer. Specifically, we found the following issue with your promotional image:
+
+ – Your promotional image is the same as your app’s icon.
+
+Next Steps
+
+To resolve this issue, please revise your promotional image to ensure it is unique and accurately represents the associated promoted in-app purchase and/or win back offer. 
+
+If you have no future plans on promoting this in-app purchase product, you can delete the associated promotional image in App Store Connect. 
+
+Resources
+
+- Learn how to view and edit in-app purchase information in App Store Connect.
+- Discover more best practices for promoting your in-app purchases on the App Store.
+
+
+Guideline 3.1.2 - Business - Payments - Subscriptions
+Issue Description
+
+The submission did not include all the required information for apps offering auto-renewable subscriptions.
+
+The following information needs to be included within the app:
+
+- A functional link to the Terms of Use (EULA)
+- A functional link to the privacy policy
+
+You can use SubscriptionStoreView to easily include all of the required information in the app's purchase flow.
+
+The following information needs to be included in the App Store metadata:
+
+- A functional link to the Terms of Use (EULA). If you are using the standard Apple Terms of Use (EULA), include a link to the Terms of Use in the App Description. If you are using a custom EULA, add it in App Store Connect.
+
+Next Steps
+
+Update the app and App Store metadata to include the information specified above.
+
+Resources
+
+Apps offering auto-renewable subscriptions must include all of the following required information in the app itself:
+
+- Title of auto-renewing subscription (this may be the same as the in-app purchase product name)
+- Length of subscription
+- Price of subscription, and price per unit if appropriate
+- Functional links to the privacy policy and Terms of Use (EULA)
+
+The app metadata must also include functional links to the privacy policy in the Privacy Policy field in App Store Connect and the Terms of Use (EULA) in the App Description or EULA field in App Store Connect.
+
+Review Schedule 2 of the Apple Developer Program License Agreement to learn more.
+
+
+Guideline 2.1 - Performance - App Completeness
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, we were unable to purchase your in-app purchase because of the error message. 
+no action was taken place after we tapped on Upgrade  button. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Pro 11-inch (M4) 
+- OS version: iPadOS 26.2.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+
+Kathleen Schechner2026-02-23 11:58 PM
+Hello,
+
+Thank you again for your clear guidance and for your patience throughout this process.
+
+We’ve now addressed both of the outstanding issues you identified:
+
+1. iPad Pro (2nd Gen) and 13-inch iPad screenshots (Guideline 2.3.3)
+
+We replaced the previous images with new screenshots that show the actual app in use on the relevant iPad devices.
+
+Each screenshot now highlights the core concept and primary workflows of the app so users can clearly understand its functionality and value.
+
+Using “View All Sizes in Media Manager,” we verified that all iPad Pro (2nd Gen) and 13‑inch iPad variants are correctly populated with accurate, in‑app screenshots only.
+
+2. In‑App Purchase subscription flow (Guideline 2.1)
+
+We resolved the error that prevented users from viewing or purchasing subscription options on iPad Air 11‑inch (M3) running iPadOS 26.3.
+
+The subscription paywall now loads reliably, and available subscription options (including pricing and terms) display correctly before purchase.
+
+We tested the full flow in the sandbox environment on iPad, including: loading subscription options, initiating the purchase, and confirming the post‑purchase state.
+
+All in‑app purchase products have complete metadata (localizations, review notes, and review screenshots) and are properly linked to this app in App Store Connect.
+
+The Paid Apps Agreement is in effect for this account, and the app is configured to offer these subscriptions without account‑level blocking issues.
+
+Everything—screenshots, metadata, and IAP configuration—is now set up in the correct locations and ready for your review. If you encounter anything else that doesn’t look right on your side, I’d be grateful for the opportunity to correct it quickly.
+
+Thank you again for your time and for helping us bring a better product to the App Store.
+
+Yours truly,
+Ohad Phoenix Oren
+3.6.Nife
+Message Attachments:
+relish store ready.jpgDownload
+Date Submitted
+Feb 24, 2026 at 12:24 AM
+Submission ID
+04b02b29-c39c-4d1c-aa99-6d313b600a80
+
+Messages (6)
+
+Apple2026-02-26 3:25 AM
+Hello,
+
+Thank you for your efforts to follow our guidelines. There are some outstanding issues that still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: c387242a-a322-478a-855a-880ef705b977
+Review date: February 26, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+
+Guideline 2.1 - Performance - App Completeness
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, there was no response when we tapped on upgrade. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.3
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+
+Guideline 2.3.2 - Performance - Accurate Metadata
+
+We noticed that your promotional image to be displayed on the App Store does not sufficiently represent the associated promoted in-app purchase and/or win back offer. Specifically, we found the following issue with your promotional image:
+
+ – Your promotional image includes text that is small or otherwise hard to read. 
+
+Next Steps
+
+To resolve this issue, please revise your promotional image to ensure it is unique and accurately represents the associated promoted in-app purchase and/or win back offer. 
+
+
+Guideline 3.1.2 - Business - Payments - Subscriptions
+Issue Description
+
+The submission did not include all the required information for apps offering auto-renewable subscriptions.
+
+The following information needs to be included within the app:
+
+- A functional link to the Terms of Use (EULA)
+- A functional link to the privacy policy
+
+You can use SubscriptionStoreView to easily include all of the required information in the app's purchase flow.
+
+The following information needs to be included in the App Store metadata:
+
+- A functional link to the Terms of Use (EULA). If you are using the standard Apple Terms of Use (EULA), include a link to the Terms of Use in the App Description. If you are using a custom EULA, add it in App Store Connect.
+
+Next Steps
+
+Update the app and App Store metadata to include the information specified above.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+2.3.2 Performance: Accurate Metadata
+
+3.1.2 Business: Payments - Subscriptions
+
+Rejection Attachments:
+Screenshot-0226-161903.pngDownload
+Screenshot-0226-162316.pngDownload
+RELISH_PEAK_PACKAGE.jpgDownload
+
+Kathleen Schechner2026-02-27 2:14 PM
+
+Apple2026-03-03 8:18 PM
+Hello,
+
+Thank you for your resubmission. Upon further review, we identified additional issues that need your attention. See below for more information.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: c387242a-a322-478a-855a-880ef705b977
+Review date: March 04, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+
+Guideline 3.1.2(c) - Business - Payments - Subscriptions
+Issue Description
+
+The submission did not include all the required information for apps offering auto-renewable subscriptions.
+
+You can use SubscriptionStoreView to easily include all of the required information in the app's purchase flow.
+
+The following information needs to be included in the App Store metadata:
+
+- A functional link to the Terms of Use (EULA). If you are using the standard Apple Terms of Use (EULA), include a link to the Terms of Use in the App Description. If you are using a custom EULA, add it in App Store Connect.
+
+Next Steps
+
+Update the App Store metadata to include the information specified above.
+
+
+Guideline 1.5 - Safety
+Issue Description
+
+The Support URL provided in App Store Connect, https://docs.google.com/document/d/12awUGUOXe3EXtWyHRPPb3Ri-svFfuTjAk_pkAb43n0Q/edit?usp=drive_link, is currently not functional and/or displays an error. 
+
+Next Steps
+
+Update the specified Support URL to direct users to a functional webpage with support information.
+
+Resources
+
+- Learn about Support URLs and other platform version information on App Store Connect Help.
+- Learn more about developer information requirements in guideline 1.5.
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, a connection error message was displayed when we tried to purchase and the review device was connected to an active internet connection. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.3
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+1.5.0 Safety: Developer Information
+
+2.1.0 Performance: App Completeness
+
+3.1.2 Business: Payments - Subscriptions
+
+Rejection Attachments:
+Screenshot-0304-091717.pngDownload
+
+Kathleen Schechner2026-03-03 11:55 PM
+Hello,
+
+Fixed the issues you identified. Let us know if any others need our attention.
+
+Thanks,
+Janina 
+The sauc-e Team
+
+Apple2026-03-08 11:44 AM
+Hello,
+
+Some of the issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: c387242a-a322-478a-855a-880ef705b977
+Review date: March 08, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, when we tried to get the subscription. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.3.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+
+
+Guideline 3.1.2(c) - Business - Payments - Subscriptions
+Issue Description
+
+The submission did not include all the required information for apps offering auto-renewable subscriptions.
+
+You can use SubscriptionStoreView to easily include all of the required information in the app's purchase flow.
+
+The following information needs to be included in the App Store metadata:
+
+- A functional link to the Terms of Use (EULA). If you are using the standard Apple Terms of Use (EULA), include a link to the Terms of Use in the App Description. If you are using a custom EULA, add it in App Store Connect.
+
+Next Steps
+
+Update the App Store metadata to include the information specified above.
+
+Resources
+
+Apps offering auto-renewable subscriptions must include all of the following required information in the app itself:
+
+- Title of auto-renewing subscription (this may be the same as the In-App Purchase product name)
+- Length of subscription
+- Price of subscription, and price per unit if appropriate
+- Functional links to the privacy policy and Terms of Use (EULA)
+
+The app metadata must also include functional links to the privacy policy in the Privacy Policy field in App Store Connect and the Terms of Use (EULA) in the App Description or EULA field in App Store Connect.
+
+Review Schedule 2 of the Apple Developer Program License Agreement to learn more.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+
+Kathleen Schechner2026-03-08 10:12 PM
+Hello,
+Fixed the issues you identified. Let us know if any others need our attention.
+Thanks,
+Janina 
+The sauc-e Team
+Date Submitted
+Mar 8, 2026 at 10:48 PM
+
+Messages (2)
+
+Apple2026-03-09 4:40 AM
+Hello,
+
+Thank you for your efforts to follow our guidelines. There are some outstanding issues that still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: f109d219-507d-4bc3-815d-588ced102bf2
+Review date: March 09, 2026
+Review Device: iPhone 17 Pro Max and iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, a connection error message was displayed when we tried to purchase and the review device was connected to an active internet connection. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max and iPad Air 11-inch (M3) 
+- OS version: iOS 26.3.1 and iPadOS 26.3.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+
+Kathleen Schechner2026-03-09 3:06 PM
+Hi,
+Fixed the issue you identified. Let us know if another one needs our attention.
+Thank You,
+Janina 
+The sauc-e Team
+
+Messages (14)
+
+Apple2026-03-12 4:29 AM
+Hello,
+
+Thank you for your resubmission. Upon further review, we identified additional issues that need your attention. See below for more information.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 2679c524-0a4b-4b20-9944-61274cfeff1c
+Review date: March 12, 2026
+Review Device: iPhone 17 Pro Max
+Version reviewed: 1.2.3
+
+Guideline 2.1(a) - Performance
+Issue Description
+
+The app crashed during review. Apps that crash negatively impact users. 
+
+Steps leading to crash:
+
+-Tap the in-app purchase button
+-App crashed
+
+Review device details:
+
+- Device type: iPhone 17 Pro Max 
+- OS version: iOS 26.3.1
+
+Next Steps
+
+Test the app on supported devices to identify crashes and stability issues before resubmitting for review. Crash logs have been attached to help resolve this issue:
+
+1. Fully symbolicate the crash report. See Adding Identifiable Symbol Names to a Crash Report.
+2. Match the crash report to a common pattern. Based on the pattern, take specific actions to further investigate the crash. See Identifying the Cause of Common Crashes.
+3. Once the root causes of the crash have been identified, make the appropriate changes to the binary to resolve the issue.
+4. Test the app on a device to ensure that it runs as expected.
+
+Note that users expect apps they download to function on all the devices where they are available. For example, apps that may be downloaded onto iPad devices should function as expected for iPad users. Learn more about supporting apps on compatible devices.
+
+Resources
+
+- For more information on crash reports, see Diagnosing Issues Using Crash Reports and Device Logs.
+- For information about testing apps and preparing them for review, see Testing a Release Build.
+- To learn about troubleshooting networking issues, see Networking Overview.
+
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+crashlog-B4138981-4D26-475F-9C85-1C97033A1CAC.ipsDownload
+crashlog-F09B6667-6464-4D28-8B59-6070C97CF0AA.ipsDownload
+crashlog-56954E11-13FC-4788-967A-A560D5CED243.ipsDownload
+
+Kathleen Schechner2026-03-13 11:45 AM
+Hi,
+Fixed the issue you identified. Let us know if another one needs our attention.
+Thank You Very Much,
+Janina 
+The sauc-e Team
+
+Apple2026-03-17 12:48 PM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 2679c524-0a4b-4b20-9944-61274cfeff1c
+Review date: March 17, 2026
+Review Device: iPad Pro 11-inch (M4)
+Version reviewed: 1.2.3
+
+Guideline 2.1(a) - Performance
+Issue Description
+
+The app crashed during review. Apps that crash negatively impact users. 
+
+Steps leading to crash:
+
+- app crashed when we tapped on "Peak Performance - $9.99month".
+
+Review device details:
+
+- Device type: iPad Pro 11-inch (M4) 
+- OS version: iPadOS 26.3.1
+
+Next Steps
+
+Test the app on supported devices to identify crashes and stability issues before resubmitting for review. Crash logs have been attached to help resolve this issue:
+
+1. Fully symbolicate the crash report. See Adding Identifiable Symbol Names to a Crash Report.
+2. Match the crash report to a common pattern. Based on the pattern, take specific actions to further investigate the crash. See Identifying the Cause of Common Crashes.
+3. Once the root causes of the crash have been identified, make the appropriate changes to the binary to resolve the issue.
+4. Test the app on a device to ensure that it runs as expected.
+
+Note that users expect apps they download to function on all the devices where they are available. For example, apps that may be downloaded onto iPad devices should function as expected for iPad users. Learn more about supporting apps on compatible devices.
+
+Resources
+
+- For more information on crash reports, see Diagnosing Issues Using Crash Reports and Device Logs.
+- For information about testing apps and preparing them for review, see Testing a Release Build.
+- To learn about troubleshooting networking issues, see Networking Overview.
+
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+crashlog-01C3BABE-363E-41A1-8DEF-72D3A49D63F8.ipsDownload
+Screenshot-0317-094745.pngDownload
+
+Kathleen Schechner2026-03-17 6:57 PM
+Hi,
+
+Fixed IAP crash (2.1a) - added sandbox‑safe offerings/product validation before purchasePackage(). 
+
+Simulator tested: iPhone 17 Pro Max + iPad Pro M4 → no crash on "Peak Performance" tap.
+
+TestFlight Internal build ready for your verification.
+
+Thanks,
+Janina
+The sauc-e Team
+
+Apple2026-03-21 7:15 PM
+
+Kathleen Schechner2026-03-21 10:09 PM
+Hey,
+
+We have completed the manual environment reset as specified for the Darwin architecture.
+
+Steps Taken:
+
+Purged all watchman watches and terminated active node processes.
+
+Cleaned node_modules, ios/build, and cleared DerivedData.
+
+Re-indexed the bridge via a fresh pod install.
+
+Flushed the Darwin discovery cache (dscacheutil).
+
+The Result:
+The SIGABRT in the TurboModuleManager queue remains. The application is still being aborted by pthread_kill at the hardware interface level.
+
+This confirms the issue is not a corrupted local cache or a bad build artifact. The failure is happening within the OS’s handling of the Meta runtime modules on this specific iPadOS version.
+
+This probably what devs mean by works local on their machine not others'.
+
+Thanks,
+Janina aHuman Resource
+sauc-e.com
+
+Apple2026-03-30 4:41 PM
+
+
+Review Environment
+Submission ID: 2679c524-0a4b-4b20-9944-61274cfeff1c
+Review date: March 30, 2026
+Review Device: iPhone 17 Pro Max and iPad Pro 11-inch (M4)
+Version reviewed: 1.2.3
+
+Guideline 2.1(a) - Performance - App Completeness
+
+Issue Description
+
+We were unable to review the app because it crashed on launch. We have attached detailed crash logs to help troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max and iPad Pro 11-inch (M4) 
+- OS version: iOS 26.4 and iPadOS 26.4
+
+Next Steps
+
+To address the crash in the app, follow these steps:
+
+1. Fully symbolicate the crash report. See Adding Identifiable Symbol Names to a Crash Report for an explanation of the symbolication process.
+2. Match the crash report to a common pattern. Based on the pattern, take specific actions to further investigate the crash. See Identifying the Cause of Common Crashes.
+3. Test the app on a device to ensure that it now runs as expected.
+4. Once the crash is addressed, create and submit a new build for review.
+
+Note that users expect apps they download to function on all the devices where they are available. For example, apps that may be downloaded onto iPad devices should function as expected for iPad users. Learn more about supporting apps on compatible devices.
+
+Resources
+
+For additional information on crash reports, see Diagnosing Issues Using Crash Reports and Device Logs.
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+crashlog-1C64653B-8F1A-46D1-898D-0D603D27BF56.ipsDownload
+crashlog-84144E4E-5940-4223-8C51-3CB36AF7FB34.ipsDownload
+
+Kathleen Schechner2026-04-02 9:16 AM
+Hello,
+Fixed the issues you identified. Let us know if any others need our attention.
+Thanks,
+Janina 
+aHuman Resource wit sauc-e Team
+
+Apple2026-04-06 12:42 PM
+Hello,
+
+Thank you for your efforts to follow our guidelines. There are some outstanding issues that still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 2679c524-0a4b-4b20-9944-61274cfeff1c
+Review date: April 06, 2026
+Review Device: iPhone 17 Pro Max
+Version reviewed: 1.2.3
+
+
+Guideline 2.1(b) - Information Needed
+
+We have started the review of the app, but we are not able to continue because we cannot locate the In-App Purchases, such as RELISH PEAK and RELISH Premium, within the app at this time.
+
+Next Steps
+
+To help us proceed with the review of the app, please reply to this message providing the steps for locating the In-App Purchases in the app.
+
+Note that In-App Purchases are reviewed in an Apple-provided sandbox environment. Make sure they have been appropriately configured for review in the Apple-provided sandbox environment.
+
+If you are restricting access to In-App Purchases based on factors such as storefront or device configurations, please include this information in your reply along with steps to enable the In-App Purchases for our review. 
+
+Additionally, note that the Account Holder must accept the Paid Apps Agreement in the Business section of App Store Connect before paid In-App Purchases will function.
+
+Resources
+
+- Learn more about offering In-App Purchases. 
+- Learn more about testing in sandbox.
+- Learn more about submitting In-App Purchases and subscriptions to App Review.
+
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0406-094109.pngDownload
+
+Kathleen Schechner2026-04-09 1:57 AM
+Hey Apple, 
+
+We addressed the issue where In‑App Purchases were not discoverable / did not appear in the sandbox environment.
+
+How to locate the In‑App Purchases
+
+Launch the app.
+On the main screen, tap “Upgrade to Premium · X free left” (button near the top).
+This opens the in‑app paywall which displays our subscription options: RELISH PEAK and RELISH Premium.
+Tap a subscription option to proceed to Apple’s purchase confirmation sheet.
+A Restore Purchases button is also available on the same screen for existing subscribers.
+Fix implemented:
+
+We updated the subscription flow so the paywall and subscription options are always reachable and the app provides clear feedback if offerings cannot be loaded in a given sandbox state, instead of appearing to do nothing.
+We added/verified Restore Purchases functionality and improved error handling around loading offerings and starting purchases to prevent no‑op behavior.
+
+Let us know if anything else requires our attention.
+
+Thanks,
+
+Janina 
+aHuman Resource
+sauc-e.com
+
+Apple2026-04-09 10:57 AM
+Hello,
+
+Thank you for your efforts to follow our guidelines. There are some outstanding issues that still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 2679c524-0a4b-4b20-9944-61274cfeff1c
+Review date: April 09, 2026
+Review Device: iPhone 17 Pro Max
+Version reviewed: 1.2.3
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+We are unable to complete the review of the app because one or more of the In-App Purchase products have not been submitted for review.
+
+Specifically, the app includes references to Relish Premium but the associated In-App Purchase products have not been submitted for review. 
+
+ 
+
+Next Steps
+
+To resolve this issue, please be sure to take action and submit your In-App Purchases and upload a new binary in App Store Connect so we can proceed with our review. 
+
+Note you must provide an App Review screenshot in App Store Connect in order to submit In-App Purchases for review. Learn more about required In-App Purchase metadata.
+
+Resources 
+
+- Learn more about how to offer In-App Purchases.
+- Learn more about submitting In-App Purchases and subscriptions to App Review.
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, an error message displayed when tapped "Upgrade to Premium". Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max 
+- OS version: iOS 26.4
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0409-075330.pngDownload
+Screenshot-0409-075224.pngDownload
+
+Kathleen Schechner2026-04-15 5:57 AM
+Hello,
+Fixed the iap package issue you identified. Let us know if any others need our attention.
+Thanks,
+Janina 
+aHuman Resource wit sauc-e Team
+
+Apple2026-04-15 1:13 PM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 2679c524-0a4b-4b20-9944-61274cfeff1c
+Review date: April 15, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+We are unable to complete the review of the app because one or more of the In-App Purchase products have not been submitted for review.
+
+Specifically, the app includes references to Relish Premium ($4.00/month) but the associated In-App Purchase products have not been submitted for review. 
+
+ 
+
+Next Steps
+
+To resolve this issue, please be sure to take action and submit your In-App Purchases and upload a new binary in App Store Connect so we can proceed with our review. 
+
+Note you must provide an App Review screenshot in App Store Connect in order to submit In-App Purchases for review. Learn more about required In-App Purchase metadata.
+
+Resources 
+
+- Learn more about how to offer In-App Purchases.
+- Learn more about submitting In-App Purchases and subscriptions to App Review.
+
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically,  we experienced an error message when attempting to purchase. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.4.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+
+
+Guideline 3.1.2(c) - Business - Payments - Subscriptions
+Issue Description
+
+The submission did not include all the required information for apps offering auto-renewable subscriptions.
+
+The following information needs to be included within the app:
+
+- A functional link to the Terms of Use (EULA)
+- A functional link to the privacy policy
+
+You can use SubscriptionStoreView to easily include all of the required information in the app's purchase flow.
+
+Next Steps
+
+Update the app to include the information specified above.
+
+Once the app and metadata includes all of the required information, or if they already do, reply to this message with a screen recording to confirm. Include this information in the Notes field of the App Review Information section in App Store Connect for future submissions.
+
+Resources
+
+Apps offering auto-renewable subscriptions must include all of the following required information in the app itself:
+
+- Title of auto-renewing subscription (this may be the same as the In-App Purchase product name)
+- Length of subscription
+- Price of subscription, and price per unit if appropriate
+- Functional links to the privacy policy and Terms of Use (EULA)
+
+The app metadata must also include functional links to the privacy policy in the Privacy Policy field in App Store Connect and the Terms of Use (EULA) in the App Description or EULA field in App Store Connect.
+
+Review Schedule 2 of the Apple Developer Program License Agreement to learn more.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+
+Kathleen Schechner2026-04-18 3:16 AM
+Hello,
+Removed RELISH Premium, renamed PEAK. Let us know if another one needs our attention.
+Thanks,
+Janina 
+aHuman Resource
+The sauc-e Team
+Date Submitted
+Apr 18, 2026 at 3:17 AM
+
+Messages (15)
+
+Apple2026-04-18 5:42 AM
+Hello,
+
+Thank you for your resubmission. Upon further review, we identified additional issues that need your attention. See below for more information.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: April 18, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 1.2.3
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, no action took place when we tapped on the Relish Peak subscription plan and displayed an error message. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.4.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+Guideline 3.1.2(c) - Business - Payments - Subscriptions
+Issue Description
+
+The submission did not include all the required information for apps offering auto-renewable subscriptions.
+
+The following information needs to be included within the app:
+
+- A functional link to the privacy policy
+
+You can use SubscriptionStoreView to easily include all of the required information in the app's purchase flow.
+
+Next Steps
+
+Update the app to include the information specified above.
+
+Once the app and metadata includes all of the required information, or if they already do, reply to this message with a screen recording to confirm. Include this information in the Notes field of the App Review Information section in App Store Connect for future submissions.
+
+Resources
+
+Apps offering auto-renewable subscriptions must include all of the following required information in the app itself:
+
+- Title of auto-renewing subscription (this may be the same as the In-App Purchase product name)
+- Length of subscription
+- Price of subscription, and price per unit if appropriate
+- Functional links to the privacy policy and Terms of Use (EULA)
+
+The app metadata must also include functional links to the privacy policy in the Privacy Policy field in App Store Connect and the Terms of Use (EULA) in the App Description or EULA field in App Store Connect.
+
+Review Schedule 2 of the Apple Developer Program License Agreement to learn more.
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+3.1.2 Business: Payments - Subscriptions
+
+Rejection Attachments:
+Screenshot-0418-103955.pngDownload
+
+Kathleen Schechner2026-04-18 7:43 PM
+Hi.
+Both issues from the 4/18 review are addressed in v3.1.2.
+Guideline 2.1(b) — tap on Relish Peak, no action / error message.
+The fallback code path silently re-opened the paywall instead of showing the user what happened. Fixed. Tapping Relish Peak now shows an Alert with Try Again / Close. You will see action + a clear message every time, regardless of whether the App Store offerings loaded.
+Guideline 3.1.2(c) — functional privacy policy link inside purchase flow.
+Added inside the paywall modal:
+
+Subscription Details — Title (RELISH Peak), Length (1 month, auto-renewing), Price ($9.99/month USD), Price per unit.
+"Privacy Policy and Support" button — opens https://www.sauc-e.com/privatesupport
+"Terms of Use (EULA)" button — opens Apple's standard EULA.
+
+Screen recording attached.
+Thanks for the catch.
+Janina
+aHuman Resource
+the sauc-e team
+
+Apple2026-04-21 2:32 AM
+Hello,
+
+Thank you for your efforts to follow our guidelines. There are some outstanding issues that still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: April 21, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 3.1.2
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, the app displayed subscription unavailable error message when we tapped on the RELISH Peak subscription plan. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.4.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0421-072915.pngDownload
+
+Kathleen Schechner2026-04-21 6:20 AM
+Hi. 
+Swift clarification: the RELISH Peak subscription is currently in "Waiting for Review" status in App Store Connect. It's submitted alongside this app binary and requires your approval to resolve in the sandbox. 
+The "Subscription Unavailable" alert is the app correctly surfacing that RevenueCat cannot fetch offerings — because the product itself isn't yet approved on your side. Once approved, the flow will complete as it do. 
+
+Thanks,
+Janina 
+aHuman Resource 
+the sauc-e team 
+Message Attachments:
+Screenshot-0421-072915.pngDownload
+
+Apple2026-04-21 7:44 AM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: April 21, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 3.1.2
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, the app displayed subscription unavailable error message when we tapped on the RELISH Peak subscription plan. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.4.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0421-124213.pngDownload
+
+Kathleen Schechner2026-04-21 2:46 PM
+Re: Guideline 2.1
+
+Product was broken. Replaced with relish_peak2.
+
+Live on 3.1.2 (42). RevenueCat updated. Sandbox purchase should be cool now.
+
+thx,
+Janina
+aHuman Resource
+the sauc-e team
+
+Apple2026-04-22 1:59 AM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: April 22, 2026
+Review Device: iPad Air 11-inch (M3) and iPhone 17 Pro Max
+Version reviewed: 3.1.2
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, the app still displayed subscription unavailable error message when we tapped on the RELISH Peak subscription plan. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) and iPhone 17 Pro Max 
+- OS version: iOS 26.4.1
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0422-065806.pngDownload
+Screenshot-0422-065808.pngDownload
+
+Apple2026-04-28 6:57 AM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: April 28, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 3.1.3 (43)
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, the app still displayed subscription unavailable error message when we tapped on the RELISH Peak subscription plan. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.4.2
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0428-115630.pngDownload
+
+Kathleen Schechner2026-05-03 9:52 PM
+Thank you for reviewing RELISH v3.1.3.
+This build ships with server-side diagnostic instrumentation specifically scoped to the in-app purchase flow that has been flagged in prior review rounds. The purpose of this build is to establish a common data record between your review session and our engineering logs, so that the specific failure condition observed on the review device can be identified from our side.
+If the "Upgrade to Peak" button behaves unexpectedly on your review device, please follow this procedure:
+
+From the main screen, tap "Upgrade to Peak · 10 free left."
+If a "Subscription Unavailable" alert appears, tap Show Diagnostic.
+Alternatively, scroll to the bottom of the paywall modal and tap the "Paywall not working? Tap here to show diagnostic" button.
+The diagnostic panel will display the complete state of the subscription system at the moment of your test, including the Session ID at the bottom of the panel.
+Please include the Session ID in your response to this submission. This Session ID permits us to correlate your review session with the corresponding server-side log on our backend and identify the specific condition producing the failure.
+
+The diagnostic payload is transmitted to our server automatically when the panel is opened, so the data will be available on our side regardless of whether the reviewer chooses to tap "Send to Developer."
+Supporting context: Three sister applications from our organization are currently live and successfully processing payments via PayPal, Stripe, and Square on the web at sauc-e.com, cats-up.app, and catsup.net. We have not been able to reproduce the failure condition on any of our test devices or sandbox accounts. The present build is our standard engineering procedure for diagnosing an issue that cannot be reproduced in the local environment: instrument the remote environment and correlate logs.
+All Apple Guideline 3.1.2(c) subscription disclosures (title, duration, price, auto-renew language), Apple Standard EULA link, Privacy Policy link, and Restore Purchases control remain present and in the same locations as in v3.1.2.
+Thank you for your assistance in identifying the condition on your review device.
+
+Chad with IT & Engineering
+the sauc-e team
+
+Apple2026-05-05 4:05 AM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: May 05, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 3.1.3 (44)
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, the app displayed an error message when we attempted to purchase the subscription plan and there was no option of "Show Diagnostic" or "Paywall not working?". Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max and iPad Air 11-inch (M3) 
+- OS version: iOS 26.4.2
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Resources
+
+Learn more about app completeness requirements in guideline 2.1(b).
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0505-085950.pngDownload
+Screenshot-0505-085956.pngDownload
+
+Kathleen Schechner2026-05-05 7:07 PM
+# RELISH v3.2.1 — Apple Review Notes
+
+**Subject line for internal routing:** RELISH v3.2.1 — Diagnostic Fix — Session ID Required
+
+---
+
+## What Changed
+
+v3.2.0 shipped with diagnostic instrumentation. One UI entry point wasn't rendering when offerings returned empty.
+
+Fixed: diagnostic banner now shows whether offerings fail *or* return zero packages. Reviewer always has a "Show Diagnostic" button.
+
+## What You'll See
+
+1. Tap "Upgrade to Peak · [N] free left"
+2. Paywall opens
+3. If anything goes wrong with products, an error banner appears with a **"Show Diagnostic Details"** button
+4. Tap it → diagnostic panel opens → Session ID appears at bottom
+5. Include that Session ID in your response to us
+
+That's it. One tap, one number, problem solved on both ends.
+
+## If It Works Fine
+
+Great. Tap the paywall title three times → diagnostic panel opens → confirms everything loaded correctly.
+
+---
+
+## Session ID Format
+
+`rlsh-<timestamp>-<6 chars>`
+
+Paste it in your response. We correlate it with our backend logs and identify exactly what your device saw.
+
+---
+
+## Context
+
+Three sister apps live on the web (sauc-e.com, cats-up.app, catsup.net) processing payments via PayPal/Stripe/Square. We rebuilt RevenueCat from scratch before this submission. We cannot reproduce the v3.1.x failure locally. v3.2.1 is the instrumentation we use to see what your device sees.
+
+Thank you.
+
+—Chad with IT & Engineering
+the sauc-e team
+
+Apple2026-05-06 11:11 PM
+Hello,
+
+The issues we previously identified still need your attention.
+
+If you have any questions, we are here to help. Reply to this message in App Store Connect and let us know.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: May 07, 2026
+Review Device: iPhone 17 Pro Max and iPad Air 11-inch (M3)
+Version reviewed: 3.2.1 (46)
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+The In-App Purchase products in the app still exhibited one or more bugs which create a poor user experience. Specifically, an error message displayed after we tapped the 'RELISH Peak' button. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPhone 17 Pro Max and iPad Air 11-inch (M3) 
+- OS version: iOS 26.4.2 and iPadOS 26.4.2
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0507-110842.pngDownload
+
+Kathleen Schechner2026-05-07 9:27 AM
+Added entitlement to apropos jason.
+
+Thx,
+Janina
+aHR w sauc-e team 
+
+Apple2026-05-09 3:17 AM
+Hello,
+
+Thank you for your resubmission. There are still some issues that need your attention.
+
+We have set up a call with an Apple Representative to discuss your app's review. An Apple Representative will call you on the number you provided in the App Review Information section of App Store Connect within the next 3 to 5 business days to discuss your app. Please ensure you have provided the correct contact information.
+
+Review Environment
+Submission ID: 6a5cfdd5-804c-44ea-8804-0905263c685c
+Review date: May 09, 2026
+Review Device: iPad Air 11-inch (M3)
+Version reviewed: 3.2.3 (54)
+
+Guideline 2.1(b) - Performance - App Completeness
+
+Issue Description
+
+We continue to notice that the In-App Purchase products in the app exhibited one or more bugs which create a poor user experience. Specifically, there was an error preventing the user to subscribe. Review the details and resources below to troubleshoot this issue.
+
+Review device details: 
+
+- Device type: iPad Air 11-inch (M3) 
+- OS version: iPadOS 26.4.2
+
+Next Steps
+
+Apple reviews In-App Purchase products in the sandbox and the In-App Purchase products do not need prior approval to function in review. Review the product configurations, complete any missing information, and test them in the sandbox.
+
+To offer In-App Purchases in the app, the Account Holder must also accept the Paid Apps Agreement in the Business section of App Store Connect. Confirm you have a Paid Apps Agreement in effect.
+
+If you still need assistance after completing the steps and reviewing the resources, visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Support
+- Reply to this message in your preferred language if you need assistance. If you need additional support, use the Contact Us module.
+- Consult with fellow developers and Apple engineers on the Apple Developer Forums.
+- Request an App Review Appointment at Meet with Apple to discuss your app's review. Appointments subject to availability during your local business hours on Tuesdays and Thursdays.
+- Provide feedback on this message and your review experience by completing a short survey.
+
+Request a phone call from App Review
+
+At your request, we can arrange for an Apple Representative to call you within the next three to five business days to discuss your App Review issue.
+
+Request a call to discuss your app's review
+iOS App 3.2.3App Version
+Rejection Reasons:
+2.1.0 Performance: App Completeness
+
+Rejection Attachments:
+Screenshot-0509-080329.pngDownload
+
+Apple2026-05-12 1:20 PM
+Hello Ohad,
+
+Call ticket: DAC438379
+
+Thanks for your time on the phone today. As we discussed, here is the collection of links I think could be useful:
+StoreKit Documentation
+Manage Sandbox Apple Account settings
+Testing Documentation
+Validating Receipts
+
+You may also want to visit the Apple Developer Forums. If you can’t find an answer from an existing thread, start a new thread with your question to get guidance from Apple engineers and other developers.
+
+Best regards,
+Anders
+App Review
+Reply to App Review
+
+Date Submitted
+May 8, 2026 at 12:03 AM
