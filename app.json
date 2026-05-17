@@ -32,9 +32,6 @@
       }
     },
     "extra": {
-      "eas": {
-        "projectId": "2260c77f-4a38-46b3-bd13-65b1db3407f6"
-      },
       "revenueCatPublicKeyIos": "appl_gNFmOHvscXhhhoQWpgDvVPQeLZm"
     },
     "owner": "ohadren"
