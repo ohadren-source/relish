@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "RELISH (3,6,9)",
-    "slug": "relish-clean",
-    "version": "3.2.3",
+    "slug": "relish369nu",
+    "version": "1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,23 +15,23 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.nife36.relish-clean",
+      "bundleIdentifier": "com.nife36.relish36",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      },
-      "entitlements": {
-        "com.apple.developer.in-app-payments": ["merchant.com.nife36.relish-clean"]
       }
     },
     "android": {
-      "package": "com.nife36.relish369",
+      "package": "com.nife36.relish36",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "extra": {
+      "eas": {
+        "projectId": "2260c77f-4a38-46b3-bd13-65b1db3407f6"
+      },
       "revenueCatPublicKeyIos": "appl_gNFmOHvscXhhhoQWpgDvVPQeLZm"
     },
     "owner": "ohadren"
